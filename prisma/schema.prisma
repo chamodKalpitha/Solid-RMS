@@ -1,0 +1,295 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//ENUM
+enum Role {
+  ADMIN
+  OWNER
+  MANAGER
+  ASSISTANT
+}
+
+enum LeaveType {
+  SICK
+  CASUAL
+  NOPAY
+  SHORT
+  HALFDAY
+}
+
+model User {
+  id        Int     @id @default(autoincrement())
+  name      String
+  role      Role
+  email     String  @unique
+  password  String
+  address   String?
+  contactNo String  @map("contact_no")
+
+  owner   Owner?
+  manager Manager?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model Owner {
+  id                Int                @id @default(autoincrement())
+  brNo              String             @map("BR_no")
+  companyName       String             @map("company_name")
+  userId            Int                @unique
+
+  user              User               @relation(fields: [userId], references: [id])
+  outlets           Outlet[]
+  menus             Menu[]
+  employees         Employee[]
+  supplier          Supplier[]
+  supplierOrders    SupplierOrder[]
+  leaveRequests     LeaveRequest[]
+  inventoryRequests InventoryRequest[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model Manager {
+  id               Int    @id @default(autoincrement())
+  name             String
+  userId           Int    @unique
+  outletId         Int    @unique
+  leaveRequestId   Int    @unique
+  InventoryRequest Int
+  empId            Int    @unique
+
+  employee         Employee           @relation(fields: [empId], references: [id])
+  outlet           Outlet             @relation(fields: [outletId], references: [id])
+  user             User               @relation(fields: [userId], references: [id])
+  leaveRequest     LeaveRequest[]
+  inventoryRequest InventoryRequest[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model Outlet {
+  id       Int    @id @default(autoincrement())
+  capacity Int
+  location String
+  ownerId  Int
+
+  owner     Owner      @relation(fields: [ownerId], references: [id])
+  manager   Manager?
+  employees Employee[]
+  inventory Inventory?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model Inventory {
+  id       Int @id @default(autoincrement())
+  outletId Int @unique
+
+  outlet               Outlet                @relation(fields: [outletId], references: [id])
+  inventoryIngredients InventoryIngredient[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model Ingredient {
+  id   Int    @id @default(autoincrement())
+  name String
+  unit String
+
+  dishIngredients      DishIngredient[]
+  inventoryIngredients InventoryIngredient[]
+  supplierIngredients  SupplierIngredient[]
+  requestIngredients   RequestIngredient[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model InventoryIngredient {
+  id           Int @id @default(autoincrement())
+  inventoryId  Int
+  ingredientId Int
+  quantity     Int
+
+  inventory  Inventory  @relation(fields: [inventoryId], references: [id])
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([inventoryId, ingredientId])
+}
+
+model Dish {
+  id             Int    @id @default(autoincrement())
+  name           String
+  price          Float
+  estimatedCount Int
+
+  dishIngredients DishIngredient[]
+  menuDishes      MenuDish[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model DishIngredient {
+  id           Int @id @default(autoincrement())
+  dishId       Int
+  ingredientId Int
+
+  dish       Dish       @relation(fields: [dishId], references: [id])
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([dishId, ingredientId])
+}
+
+model Menu {
+  id      Int    @id @default(autoincrement())
+  name    String
+  ownerId Int
+
+  owner      Owner      @relation(fields: [ownerId], references: [id])
+  menuDishes MenuDish[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model MenuDish {
+  id     Int @id @default(autoincrement())
+  menuId Int
+  dishId Int
+
+  menu Menu @relation(fields: [menuId], references: [id])
+  dish Dish @relation(fields: [dishId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([menuId, dishId])
+}
+
+model Employee {
+  id          Int     @id @default(autoincrement())
+  name        String
+  nicNo       String  @map("nic_no")
+  address     String
+  contactNo   String  @map("contact_no")
+  emgConNo    String  @map("emg_con_no")
+  emgConName  String  @map("emg_con_name")
+  designation String
+  isCritical  Boolean @map("is_critical")
+  salary      Float
+  ownerId     Int     @map("owner_id")
+  outletId    Int
+
+  manager Manager?
+  owner   Owner    @relation(fields: [ownerId], references: [id])
+  outlet  Outlet   @relation(fields: [outletId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model Supplier {
+  id        Int    @id @default(autoincrement())
+  name      String
+  email     String
+  address   String
+  contactNo String @map("contact_no")
+  ownerId   Int
+
+  supplierIngredients SupplierIngredient[]
+  supplierOrders      SupplierOrder[]
+  owner               Owner                @relation(fields: [ownerId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model SupplierIngredient {
+  supplierId   Int
+  ingredientId Int
+
+  supplier   Supplier   @relation(fields: [supplierId], references: [id])
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@id([supplierId, ingredientId])
+}
+
+model SupplierOrder {
+  id         Int      @id @default(autoincrement())
+  quantity   Int
+  value      Float
+  date       DateTime
+  supplierId Int
+  ownerId    Int
+
+  supplier Supplier @relation(fields: [supplierId], references: [id])
+  owner    Owner    @relation(fields: [ownerId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model LeaveRequest {
+  id        Int       @id @default(autoincrement())
+  type      LeaveType
+  from      DateTime
+  noOfDate  Int
+  reason    String
+  managerId Int
+  ownerId   Int
+
+  owner   Owner   @relation(fields: [ownerId], references: [id])
+  manager Manager @relation(fields: [managerId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model InventoryRequest {
+  id        Int @id @default(autoincrement())
+  ownerId   Int
+  managerId Int
+
+  requestIngredients RequestIngredient[]
+  owner              Owner               @relation(fields: [ownerId], references: [id])
+  manager            Manager             @relation(fields: [managerId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model RequestIngredient {
+  inventoryRequestId Int
+  ingredientId       Int
+  quantity           Float
+
+  inventoryRequest InventoryRequest @relation(fields: [inventoryRequestId], references: [id])
+  ingredient       Ingredient       @relation(fields: [ingredientId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@id([inventoryRequestId, ingredientId])
+}
