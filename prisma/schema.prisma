@@ -23,14 +23,29 @@ enum LeaveType {
   HALFDAY
 }
 
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum InventoryRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ManagerStatus {
+  ACTIVE
+  INACTIVE
+}
+
 model User {
-  id        Int     @id @default(autoincrement())
-  name      String
-  role      Role
-  email     String  @unique
-  password  String
-  address   String?
-  contactNo String  @map("contact_no")
+  id       Int    @id @default(autoincrement())
+  name     String
+  role     Role
+  email    String @unique
+  password String
 
   owner   Owner?
   manager Manager?
@@ -40,10 +55,12 @@ model User {
 }
 
 model Owner {
-  id                Int                @id @default(autoincrement())
-  brNo              String             @map("BR_no")
-  companyName       String             @map("company_name")
-  userId            Int                @unique
+  id          Int     @id @default(autoincrement())
+  brNo        String  @unique @map("br_no")
+  companyName String  @map("company_name")
+  userId      Int     @unique @map("user_id")
+  address     String?
+  contactNo   String  @unique @map("contact_no")
 
   user              User               @relation(fields: [userId], references: [id])
   outlets           Outlet[]
@@ -59,15 +76,13 @@ model Owner {
 }
 
 model Manager {
-  id               Int    @id @default(autoincrement())
-  name             String
-  userId           Int    @unique
-  outletId         Int    @unique
-  leaveRequestId   Int    @unique
-  InventoryRequest Int
-  empId            Int    @unique
+  id         Int           @id @default(autoincrement())
+  status     ManagerStatus @default(ACTIVE)
+  userId     Int           @unique @map("user_id")
+  outletId   Int           @unique @map("outlet_id")
+  employeeId Int           @unique @map("employee_id")
 
-  employee         Employee           @relation(fields: [empId], references: [id])
+  employee         Employee           @relation(fields: [employeeId], references: [id])
   outlet           Outlet             @relation(fields: [outletId], references: [id])
   user             User               @relation(fields: [userId], references: [id])
   leaveRequest     LeaveRequest[]
@@ -79,9 +94,8 @@ model Manager {
 
 model Outlet {
   id       Int    @id @default(autoincrement())
-  capacity Int
   location String
-  ownerId  Int
+  ownerId  Int    @map("owner_id")
 
   owner     Owner      @relation(fields: [ownerId], references: [id])
   manager   Manager?
@@ -94,7 +108,7 @@ model Outlet {
 
 model Inventory {
   id       Int @id @default(autoincrement())
-  outletId Int @unique
+  outletId Int @unique @map("outlet_id")
 
   outlet               Outlet                @relation(fields: [outletId], references: [id])
   inventoryIngredients InventoryIngredient[]
@@ -118,10 +132,10 @@ model Ingredient {
 }
 
 model InventoryIngredient {
-  id           Int @id @default(autoincrement())
-  inventoryId  Int
-  ingredientId Int
-  quantity     Int
+  id           Int   @id @default(autoincrement())
+  inventoryId  Int   @map("inventory_id")
+  ingredientId Int   @map("ingredient_id")
+  quantity     Float
 
   inventory  Inventory  @relation(fields: [inventoryId], references: [id])
   ingredient Ingredient @relation(fields: [ingredientId], references: [id])
@@ -136,7 +150,7 @@ model Dish {
   id             Int    @id @default(autoincrement())
   name           String
   price          Float
-  estimatedCount Int
+  estimatedCount Int    @map("estimated_count")
 
   dishIngredients DishIngredient[]
   menuDishes      MenuDish[]
@@ -147,8 +161,8 @@ model Dish {
 
 model DishIngredient {
   id           Int @id @default(autoincrement())
-  dishId       Int
-  ingredientId Int
+  dishId       Int @map("dish_id")
+  ingredientId Int @map("ingredient_id")
 
   dish       Dish       @relation(fields: [dishId], references: [id])
   ingredient Ingredient @relation(fields: [ingredientId], references: [id])
@@ -162,7 +176,7 @@ model DishIngredient {
 model Menu {
   id      Int    @id @default(autoincrement())
   name    String
-  ownerId Int
+  ownerId Int    @map("owner_id")
 
   owner      Owner      @relation(fields: [ownerId], references: [id])
   menuDishes MenuDish[]
@@ -173,8 +187,8 @@ model Menu {
 
 model MenuDish {
   id     Int @id @default(autoincrement())
-  menuId Int
-  dishId Int
+  menuId Int @map("menu_id")
+  dishId Int @map("dish_id")
 
   menu Menu @relation(fields: [menuId], references: [id])
   dish Dish @relation(fields: [dishId], references: [id])
@@ -197,11 +211,12 @@ model Employee {
   isCritical  Boolean @map("is_critical")
   salary      Float
   ownerId     Int     @map("owner_id")
-  outletId    Int
+  outletId    Int     @map("outlet_id")
 
-  manager Manager?
-  owner   Owner    @relation(fields: [ownerId], references: [id])
-  outlet  Outlet   @relation(fields: [outletId], references: [id])
+  leaverequest LeaveRequest[]
+  manager      Manager?
+  owner        Owner          @relation(fields: [ownerId], references: [id])
+  outlet       Outlet         @relation(fields: [outletId], references: [id])
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -213,7 +228,7 @@ model Supplier {
   email     String
   address   String
   contactNo String @map("contact_no")
-  ownerId   Int
+  ownerId   Int    @map("owner_id")
 
   supplierIngredients SupplierIngredient[]
   supplierOrders      SupplierOrder[]
@@ -224,8 +239,9 @@ model Supplier {
 }
 
 model SupplierIngredient {
-  supplierId   Int
-  ingredientId Int
+  id           Int @id @default(autoincrement())
+  supplierId   Int @map("supplier_id")
+  ingredientId Int @map("ingredient_id")
 
   supplier   Supplier   @relation(fields: [supplierId], references: [id])
   ingredient Ingredient @relation(fields: [ingredientId], references: [id])
@@ -233,16 +249,16 @@ model SupplierIngredient {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@id([supplierId, ingredientId])
+  @@unique([supplierId, ingredientId])
 }
 
 model SupplierOrder {
   id         Int      @id @default(autoincrement())
   quantity   Int
   value      Float
-  date       DateTime
-  supplierId Int
-  ownerId    Int
+  supplydate DateTime @map("supply_date")
+  supplierId Int      @map("supplier_id")
+  ownerId    Int      @map("owner_id")
 
   supplier Supplier @relation(fields: [supplierId], references: [id])
   owner    Owner    @relation(fields: [ownerId], references: [id])
@@ -252,25 +268,29 @@ model SupplierOrder {
 }
 
 model LeaveRequest {
-  id        Int       @id @default(autoincrement())
-  type      LeaveType
-  from      DateTime
-  noOfDate  Int
-  reason    String
-  managerId Int
-  ownerId   Int
+  id         Int         @id @default(autoincrement())
+  type       LeaveType
+  from       DateTime
+  noOfDate   Int         @map("no_of_date")
+  reason     String
+  status     LeaveStatus
+  employeeId Int         @map("employee_id")
+  managerId  Int         @map("manager_id")
+  ownerId    Int         @map("owner_id")
 
-  owner   Owner   @relation(fields: [ownerId], references: [id])
-  manager Manager @relation(fields: [managerId], references: [id])
+  employee Employee @relation(fields: [employeeId], references: [id])
+  owner    Owner    @relation(fields: [ownerId], references: [id])
+  manager  Manager  @relation(fields: [managerId], references: [id])
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 }
 
 model InventoryRequest {
-  id        Int @id @default(autoincrement())
-  ownerId   Int
-  managerId Int
+  id        Int                    @id @default(autoincrement())
+  ownerId   Int                    @map("owner_id")
+  managerId Int                    @map("manager_id")
+  status    InventoryRequestStatus
 
   requestIngredients RequestIngredient[]
   owner              Owner               @relation(fields: [ownerId], references: [id])
@@ -281,8 +301,9 @@ model InventoryRequest {
 }
 
 model RequestIngredient {
-  inventoryRequestId Int
-  ingredientId       Int
+  id                 Int   @id @default(autoincrement())
+  inventoryRequestId Int   @map("inventory_request_id")
+  ingredientId       Int   @map("ingredient_id")
   quantity           Float
 
   inventoryRequest InventoryRequest @relation(fields: [inventoryRequestId], references: [id])
@@ -291,5 +312,5 @@ model RequestIngredient {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@id([inventoryRequestId, ingredientId])
+  @@unique([inventoryRequestId, ingredientId])
 }

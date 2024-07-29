@@ -4,6 +4,7 @@ import router from "./route/index.route.mjs";
 
 const app = express();
 const PORT = process.env.PORT || 3550;
+app.use(express.json());
 app.use("/api/v1", router);
 
 app.get("*", (req, res) => {
