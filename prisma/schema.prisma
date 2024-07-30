@@ -63,6 +63,8 @@ model Owner {
   contactNo   String  @unique @map("contact_no")
 
   user              User               @relation(fields: [userId], references: [id])
+  ingredient        Ingredient[]
+  dishe             Dish[]
   outlets           Outlet[]
   menus             Menu[]
   employees         Employee[]
@@ -118,10 +120,12 @@ model Inventory {
 }
 
 model Ingredient {
-  id   Int    @id @default(autoincrement())
-  name String
-  unit String
+  id      Int    @id @default(autoincrement())
+  name    String @unique
+  unit    String
+  ownerId Int
 
+  owner                Owner                 @relation(fields: [ownerId], references: [id])
   dishIngredients      DishIngredient[]
   inventoryIngredients InventoryIngredient[]
   supplierIngredients  SupplierIngredient[]
@@ -148,10 +152,12 @@ model InventoryIngredient {
 
 model Dish {
   id             Int    @id @default(autoincrement())
-  name           String
+  name           String @unique
   price          Float
   estimatedCount Int    @map("estimated_count")
+  ownerId        Int
 
+  owner           Owner            @relation(fields: [ownerId], references: [id])
   dishIngredients DishIngredient[]
   menuDishes      MenuDish[]
 
@@ -160,9 +166,10 @@ model Dish {
 }
 
 model DishIngredient {
-  id           Int @id @default(autoincrement())
-  dishId       Int @map("dish_id")
-  ingredientId Int @map("ingredient_id")
+  id           Int   @id @default(autoincrement())
+  dishId       Int   @map("dish_id")
+  ingredientId Int   @map("ingredient_id")
+  quantity     Float
 
   dish       Dish       @relation(fields: [dishId], references: [id])
   ingredient Ingredient @relation(fields: [ingredientId], references: [id])
@@ -175,7 +182,7 @@ model DishIngredient {
 
 model Menu {
   id      Int    @id @default(autoincrement())
-  name    String
+  name    String @unique
   ownerId Int    @map("owner_id")
 
   owner      Owner      @relation(fields: [ownerId], references: [id])
@@ -202,7 +209,7 @@ model MenuDish {
 model Employee {
   id          Int     @id @default(autoincrement())
   name        String
-  nicNo       String  @map("nic_no")
+  nicNo       String  @unique @map("nic_no")
   address     String
   contactNo   String  @map("contact_no")
   emgConNo    String  @map("emg_con_no")
@@ -225,9 +232,9 @@ model Employee {
 model Supplier {
   id        Int    @id @default(autoincrement())
   name      String
-  email     String
+  email     String @unique
   address   String
-  contactNo String @map("contact_no")
+  contactNo String @unique @map("contact_no")
   ownerId   Int    @map("owner_id")
 
   supplierIngredients SupplierIngredient[]

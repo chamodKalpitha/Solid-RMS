@@ -1,16 +1,17 @@
 import prisma from "../prisma/prismaClient.mjs";
-import ownerSchema from "../validation/ownerSchema.mjs";
+import ownerSchema from "../validation/owner.validation.mjs";
 
 export async function registerOwner(req, res) {
   const { error, value } = ownerSchema.validate(req.body);
   const { brNo, companyName, address, contactNo, user } = value;
   let errors = [];
 
-  try {
-    // Validate with Joi
-    if (error) return res.status(400).json({ error: error.details[0].message });
+  if (error) {
+    const errorRespond = error.details.map((err) => err.message);
+    return res.status(400).json({ status: "error", message: errorRespond });
+  }
 
-    // Combine checks for unique brNo and contactNo in owner table
+  try {
     const existingOwner = await prisma.owner.findFirst({
       where: {
         OR: [{ brNo }, { contactNo }],
@@ -21,22 +22,19 @@ export async function registerOwner(req, res) {
       if (existingOwner.brNo === brNo)
         errors.push("Business registration number already exists");
       if (existingOwner.contactNo === contactNo)
-        errors.push("Contact No already exists");
+        errors.push("Contact Number already exists");
     }
 
-    // Check for unique email in iser table
     const existingUser = await prisma.user.findUnique({
       where: { email: user.email },
     });
 
     if (existingUser) errors.push("Email already exists");
 
-    // If there are any errors, return them
     if (errors.length > 0) {
-      return res.status(400).json({ status: "fail", message: errors });
+      return res.status(400).json({ status: "error", message: errors });
     }
 
-    // Create new user & owner
     const newOwner = await prisma.user.create({
       data: {
         name: user.name,
@@ -57,13 +55,14 @@ export async function registerOwner(req, res) {
       },
     });
 
-    // Return the newly created user with owner details
     res.status(201).json({
       status: "success",
       data: newOwner,
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ status: "fail", message: "Internal server error" });
+    if (process.env.NODE_ENV === "development") console.error(err);
+    res
+      .status(500)
+      .json({ status: "error", message: ["Internal server error"] });
   }
 }
