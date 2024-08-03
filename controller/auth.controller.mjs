@@ -1,8 +1,13 @@
 import prisma from "../prisma/prismaClient.mjs";
-import ownerSchema from "../validation/owner.validation.mjs";
+import jwt from "jsonwebtoken";
+import { createOwnerSchema } from "../validation/owner.validation.mjs";
+import { loginSchema } from "../validation/auth.validation.mjs";
+import { tokens } from "../middleware/csrf.middleware.mjs";
+import "dotenv/config";
+import { checkPassword, hashPassword } from "../utilts/bcrypt.utilts.mjs";
 
 export async function registerOwner(req, res) {
-  const { error, value } = ownerSchema.validate(req.body);
+  const { error, value } = createOwnerSchema.validate(req.body);
   const { brNo, companyName, address, contactNo, user } = value;
   let errors = [];
 
@@ -35,11 +40,13 @@ export async function registerOwner(req, res) {
       return res.status(400).json({ status: "error", message: errors });
     }
 
+    const hashedPassword = hashPassword(user.password);
+
     const newOwner = await prisma.user.create({
       data: {
         name: user.name,
         email: user.email,
-        password: user.password,
+        password: hashedPassword,
         role: user.role,
         owner: {
           create: {
@@ -64,5 +71,91 @@ export async function registerOwner(req, res) {
     res
       .status(500)
       .json({ status: "error", message: ["Internal server error"] });
+  }
+}
+
+export async function login(req, res) {
+  const { error, value } = loginSchema.validate(req.body);
+  const { email, password } = value;
+
+  if (error) {
+    const errorRespond = error.details.map((err) => err.message);
+    return res.status(400).json({ status: "error", message: errorRespond });
+  }
+
+  try {
+    const user = await prisma.user.findUnique({ where: { email: email } });
+
+    if (!user)
+      return res.status(401).json({
+        status: "error",
+        message:
+          "The email or password you entered is incorrect. Please try again",
+      });
+
+    const isPasswordMatch = checkPassword(password, user.password);
+
+    if (!isPasswordMatch)
+      return res.status(401).send({
+        status: "error",
+        message:
+          "The email or password you entered is incorrect. Please try again.",
+      });
+
+    const secret = req.csrfSecret;
+    const csrfToken = tokens.create(secret);
+
+    const accessToken = jwt.sign(
+      { id: user.id },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: "15m" }
+    );
+    const refreshToken = jwt.sign(
+      { id: user.id },
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: "1d" }
+    );
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      sameSite: "None",
+      secure: false,
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+    res.status(200).json({
+      status: "success",
+      data: { accessToken, csrfToken },
+    });
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") console.log(error);
+    res
+      .status(500)
+      .json({ status: "error", message: ["Internal server error"] });
+  }
+}
+
+export async function generateRefreshToken(req, res) {
+  const cookies = req.cookies;
+  if (!cookies?.refreshToken)
+    return res.status(401).send({
+      status: "error",
+      message: "Invalid Cookie",
+    });
+  const refreshToken = cookies.refreshToken;
+  const secret = req.csrfSecret;
+  const csrfToken = tokens.create(secret);
+
+  try {
+    const data = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    const accessToken = jwt.sign(
+      { username: data.username },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: "15m" }
+    );
+    res.status(200).json({
+      status: "success",
+      data: { accessToken, csrfToken },
+    });
+  } catch (error) {
+    return res.sendStatus(403);
   }
 }

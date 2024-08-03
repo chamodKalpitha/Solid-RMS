@@ -3,7 +3,7 @@ import outletSchema from "../validation/outlet.validation.mjs";
 import "dotenv/config";
 
 export async function createOutlet(req, res) {
-  const ownerId = req.ownerId || 1;
+  const ownerId = req.user.ownerId;
   const { error, value } = outletSchema.validate(req.body);
   const { location } = value;
 

@@ -12,14 +12,26 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@acpr/rate-limit-postgresql": "^1.4.1",
     "@prisma/client": "^5.17.0",
     "@sequelize/core": "^7.0.0-alpha.41",
+    "aws-sdk": "^2.1666.0",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "csrf": "^3.1.0",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
     "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
     "pg": "^8.12.0",
     "pg-hstore": "^2.3.4",
-    "prisma": "^5.17.0"
+    "prisma": "^5.17.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.4",

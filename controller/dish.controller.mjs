@@ -3,21 +3,26 @@ import dishSchema from "../validation/dish.validation.mjs";
 import "dotenv/config";
 
 export async function createDish(req, res) {
-  const ownerId = req.ownerId || 1;
+  const ownerId = req.user.ownerId;
   const { error, value } = dishSchema.validate(req.body);
   const { name, price, estimatedCount, ingredients } = value;
   let errors = [];
-
-  const normalizedName = name.trim().replace(/\s+/g, " ").toLowerCase();
 
   if (error) {
     const errorRespond = error.details.map((err) => err.message);
     return res.status(400).json({ status: "error", message: errorRespond });
   }
 
+  const normalizedName = name.trim().replace(/\s+/g, " ").toLowerCase();
+
   try {
     // Validate all ingredient IDs
     const ingredientIds = ingredients.map((ingredient) => ingredient.id);
+    const ingredientSet = new Set(ingredientIds);
+
+    if (ingredientIds.length !== ingredientSet.length)
+      errors.push("There are duplicate ingredients");
+
     const validIngredients = await prisma.ingredient.findMany({
       where: {
         id: {
@@ -31,7 +36,10 @@ export async function createDish(req, res) {
 
     // Check if the dish already exists
     const existingDish = await prisma.dish.findUnique({
-      where: { name: normalizedName },
+      where: {
+        ownerId: ownerId,
+        name: normalizedName,
+      },
     });
 
     if (existingDish) errors.push("Dish already exists");
@@ -63,7 +71,25 @@ export async function createDish(req, res) {
       data: newDish,
     });
   } catch (err) {
-    console.error(err);
+    if (process.env.NODE_ENV === "development") console.error(err);
+    res
+      .status(500)
+      .json({ status: "error", message: ["Internal server error"] });
+  }
+}
+
+export async function getAllDishes(req, res) {
+  const ownerId = req.ownerId || 1;
+
+  console.log(req.user);
+
+  try {
+    const allDishes = await prisma.dish.findMany();
+    if (allDishes) {
+      res.status(200).json({ status: "success", data: allDishes });
+    }
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") console.error(err);
     res
       .status(500)
       .json({ status: "error", message: ["Internal server error"] });

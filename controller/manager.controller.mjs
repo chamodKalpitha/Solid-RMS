@@ -3,7 +3,7 @@ import managerSchema from "../validation/manager.validation.mjs";
 import "dotenv/config";
 
 export async function createManager(req, res) {
-  const ownerId = req.ownerId || 1;
+  const ownerId = req.user.ownerId;
   const { error, value } = managerSchema.validate(req.body);
   const { status, outletId, employeeId, user } = value;
   let errors = [];

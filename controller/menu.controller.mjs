@@ -3,19 +3,23 @@ import menuSchema from "../validation/menu.validation.mjs";
 import "dotenv/config";
 
 export async function createMenu(req, res) {
-  const ownerId = req.ownerId || 1;
+  const ownerId = req.user.ownerId;
   const { error, value } = menuSchema.validate(req.body);
   const { name, dishIds } = value;
   let errors = [];
-
-  const normalizedName = name.trim().replace(/\s+/g, " ").toLowerCase();
 
   if (error) {
     const errorRespond = error.details.map((err) => err.message);
     return res.status(400).json({ status: "error", message: errorRespond });
   }
 
+  const normalizedName = name.trim().replace(/\s+/g, " ").toLowerCase();
+
   try {
+    const menuSet = new Set(dishIds);
+    if (dishIds.length !== menuSet.length)
+      errors.push("There are duplicate dishes");
+
     // Check if all provided dish IDs exist
     const existingDishes = await prisma.dish.findMany({
       where: {
@@ -27,7 +31,10 @@ export async function createMenu(req, res) {
       errors.push("Some dish IDs are invalid");
 
     const existingMenu = await prisma.menu.findUnique({
-      where: { name: normalizedName },
+      where: {
+        ownerId: ownerId,
+        name: normalizedName,
+      },
     });
 
     if (existingMenu) errors.push("Dish already exists");

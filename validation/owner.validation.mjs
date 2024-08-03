@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-export default Joi.object({
+export const createOwnerSchema = Joi.object({
   brNo: Joi.string().required().messages({
     "string.empty": "Business registration number is required.",
     "any.required": "Business registration number is required.",
@@ -31,7 +31,7 @@ export default Joi.object({
       "string.min": "Password must be at least 6 characters long.",
       "any.required": "Password is required.",
     }),
-    role: Joi.string().valid("OWNER").required().messages({
+    role: Joi.string().valid("OWNER", "MANAGER").required().messages({
       "string.empty": "Role is required.",
       "any.only": "Role must be OWNER",
       "any.required": "Role is required.",
@@ -39,4 +39,26 @@ export default Joi.object({
   }).required(),
 }).options({
   abortEarly: false,
+});
+
+export const getAllClientSchema = Joi.object({
+  cursor: Joi.string().optional().messages({
+    "string.base": "Cursor must be a string",
+  }),
+  take: Joi.number().integer().positive().optional().default(10).messages({
+    "number.base": "Take must be a number",
+    "number.integer": "Take must be an integer",
+    "number.positive": "Take must be a positive number",
+  }),
+}).options({
+  abortEarly: false,
+});
+
+export const idSchema = Joi.object({
+  id: Joi.number().integer().positive().required().messages({
+    "number.base": "ID must be a number",
+    "number.integer": "ID must be an integer",
+    "number.positive": "ID must be a positive number",
+    "any.required": "ID is required",
+  }),
 });

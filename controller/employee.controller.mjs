@@ -3,7 +3,7 @@ import employeeSchema from "../validation/employee.validation.mjs";
 import "dotenv/config";
 
 export async function createEmployee(req, res) {
-  const ownerId = req.ownerId || 2;
+  const ownerId = req.user.ownerId;
   const { error, value } = employeeSchema.validate(req.body);
   const {
     name,

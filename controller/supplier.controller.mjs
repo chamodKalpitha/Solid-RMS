@@ -3,7 +3,7 @@ import supplierSchema from "../validation/supplier.validation.mjs";
 import "dotenv/config";
 
 export async function createSupplier(req, res) {
-  const ownerId = req.ownerId || 1;
+  const ownerId = req.user.ownerId;
   const { error, value } = supplierSchema.validate(req.body);
   const { name, email, contactNo, address, ingredients } = value;
   let errors = [];
