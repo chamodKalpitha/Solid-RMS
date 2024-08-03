@@ -14,6 +14,15 @@ export default Joi.object({
     "number.integer": "Estimated Count should be an integer",
     "any.required": "Estimated Count is a required field",
   }),
+  url: Joi.string()
+    .uri({
+      scheme: ["http", "https"],
+    })
+    .required()
+    .messages({
+      "string.uri": "The URL must be a valid HTTP or HTTPS URL.",
+      "any.required": "The URL is a required field.",
+    }),
   ingredients: Joi.array()
     .items(
       Joi.object({

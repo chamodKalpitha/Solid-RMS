@@ -12,6 +12,15 @@ export const createOwnerSchema = Joi.object({
   address: Joi.string().optional().messages({
     "string.base": "Address must be a string.",
   }),
+  url: Joi.string()
+    .uri({
+      scheme: ["http", "https"],
+    })
+    .required()
+    .messages({
+      "string.uri": "The URL must be a valid HTTP or HTTPS URL.",
+      "any.required": "The URL is a required field.",
+    }),
   contactNo: Joi.string().required().messages({
     "string.empty": "Contact number is required.",
     "any.required": "Contact number is required.",

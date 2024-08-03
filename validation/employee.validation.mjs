@@ -37,6 +37,15 @@ export default Joi.object({
     "number.base": "Salary must be a number.",
     "any.required": "Salary is required.",
   }),
+  url: Joi.string()
+    .uri({
+      scheme: ["http", "https"],
+    })
+    .required()
+    .messages({
+      "string.uri": "The URL must be a valid HTTP or HTTPS URL.",
+      "any.required": "The URL is a required field.",
+    }),
   outletId: Joi.number().integer().positive().required().messages({
     "number.base": "Outlet ID must be a number.",
     "number.integer": "Outlet ID must be an integer.",

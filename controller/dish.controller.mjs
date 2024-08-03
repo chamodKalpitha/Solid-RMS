@@ -5,7 +5,7 @@ import "dotenv/config";
 export async function createDish(req, res) {
   const ownerId = req.user.ownerId;
   const { error, value } = dishSchema.validate(req.body);
-  const { name, price, estimatedCount, ingredients } = value;
+  const { name, price, url, estimatedCount, ingredients } = value;
   let errors = [];
 
   if (error) {
@@ -53,6 +53,7 @@ export async function createDish(req, res) {
       data: {
         name: normalizedName,
         price,
+        url,
         estimatedCount,
         ownerId,
         dishIngredients: {

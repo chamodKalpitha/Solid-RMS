@@ -5,7 +5,7 @@ import "dotenv/config";
 export async function createIngredient(req, res) {
   const ownerId = req.user.ownerId;
   const { error, value } = createnew.validate(req.body);
-  const { name, unit } = value;
+  const { name, unit, price, url } = value;
 
   if (error) {
     const errorMessages = error.details.map((err) => err.message);
@@ -34,6 +34,8 @@ export async function createIngredient(req, res) {
       data: {
         name: normalizedName,
         unit,
+        price,
+        url,
         ownerId,
       },
     });

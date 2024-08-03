@@ -8,7 +8,7 @@ import { checkPassword, hashPassword } from "../utilts/bcrypt.utilts.mjs";
 
 export async function registerOwner(req, res) {
   const { error, value } = createOwnerSchema.validate(req.body);
-  const { brNo, companyName, address, contactNo, user } = value;
+  const { brNo, companyName, address, contactNo, url, user } = value;
   let errors = [];
 
   if (error) {
@@ -53,6 +53,7 @@ export async function registerOwner(req, res) {
             brNo,
             companyName,
             address,
+            url,
             contactNo,
           },
         },

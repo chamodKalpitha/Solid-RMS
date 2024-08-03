@@ -15,6 +15,7 @@ export async function createEmployee(req, res) {
     designation,
     isCritical,
     salary,
+    url,
     outletId,
   } = value;
   let errors = [];
@@ -58,6 +59,7 @@ export async function createEmployee(req, res) {
         designation,
         isCritical,
         salary,
+        url,
         ownerId,
         outletId,
       },

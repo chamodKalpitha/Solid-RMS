@@ -60,6 +60,7 @@ model Owner {
   companyName String  @map("company_name")
   userId      Int     @unique @map("user_id")
   address     String?
+  url         String
   contactNo   String  @unique @map("contact_no")
 
   user              User               @relation(fields: [userId], references: [id])
@@ -124,6 +125,7 @@ model Ingredient {
   name    String 
   unit    String
   price   Float
+  url         String
   ownerId Int
 
   owner                   Owner                     @relation(fields: [ownerId], references: [id])
@@ -158,6 +160,7 @@ model Dish {
   id             Int    @id @default(autoincrement())
   name           String 
   price          Float
+  url            String
   estimatedCount Int    @map("estimated_count")
   ownerId        Int
 
@@ -225,6 +228,7 @@ model Employee {
   designation String
   isCritical  Boolean @map("is_critical")
   salary      Float
+  url         String
   ownerId     Int     @map("owner_id")
   outletId    Int     @map("outlet_id")
 
