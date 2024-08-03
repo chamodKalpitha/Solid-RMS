@@ -2,12 +2,18 @@ import rateLimit from "express-rate-limit";
 import { PostgresStore } from "@acpr/rate-limit-postgresql";
 import "dotenv/config";
 
+const dbString = process.env.DATABASE_URL;
+const parsedUrl = parseDatabaseUrl(dbString);
+
 const databaseConnection = {
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  host: process.env.DB_HOST,
-  database: process.env.DB_DATABASE,
-  port: process.env.DB_PORT,
+  user: parsedUrl.username,
+  password: parsedUrl.password,
+  host: parsedUrl.host,
+  database: parsedUrl.database,
+  port: parsedUrl.port,
+  ssl: {
+    rejectUnauthorized: false, // Set to true in production for better security
+  },
 };
 
 export default rateLimit({
@@ -24,3 +30,21 @@ export default rateLimit({
     }),
   store: new PostgresStore(databaseConnection, "aggregated_store"),
 });
+
+function parseDatabaseUrl(url) {
+  const urlPattern = /^(postgresql):\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)$/;
+  const match = url.match(urlPattern);
+
+  if (match) {
+    return {
+      protocol: match[1],
+      username: match[2],
+      password: match[3],
+      host: match[4],
+      port: parseInt(match[5], 10),
+      database: match[6],
+    };
+  } else {
+    throw new Error("Invalid DATABASE_URL format");
+  }
+}
