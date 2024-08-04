@@ -19,7 +19,7 @@ export const verifyCsrfToken = (req, res, next) => {
   if (!secret || !token || !tokens.verify(secret, token)) {
     return res
       .status(403)
-      .json({ status: "error", message: "Invalid CSRF tokena" });
+      .json({ status: "error", message: "Invalid CSRF token" });
   }
   next();
 };

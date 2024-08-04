@@ -18,8 +18,10 @@ export async function createIngredient(req, res) {
     // Check if the ingredient already exists
     const existingIngredient = await prisma.ingredient.findUnique({
       where: {
-        ownerId: ownerId,
-        name: normalizedName,
+        ownerId_name: {
+          ownerId: ownerId,
+          name: normalizedName,
+        },
       },
     });
 
@@ -54,7 +56,7 @@ export async function createIngredient(req, res) {
 
 //Get Ingredeints
 export async function getIngredients(req, res) {
-  const ownerId = req.ownerId || 1;
+  const ownerId = req.ownerId;
 
   try {
     // Find all ingredients for the owner
@@ -90,7 +92,7 @@ export async function updateIngredient(req, res) {
   const { error: idError, value: idValue } = idSchema.validate(req.params);
 
   const { id } = idValue;
-  const ownerId = req.ownerId || 1;
+  const ownerId = req.ownerId;
 
   if (idError) {
     const errorMessages = idError.details.map((err) => err.message);
@@ -141,7 +143,7 @@ export async function deleteIngredient(req, res) {
   const { error, value } = idSchema.validate(req.params);
 
   const { id } = value;
-  const ownerId = req.ownerId || 1;
+  const ownerId = req.ownerId;
 
   if (error) {
     const errorMessages = error.details.map((err) => err.message);

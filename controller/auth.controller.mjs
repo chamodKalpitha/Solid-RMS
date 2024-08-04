@@ -58,7 +58,11 @@ export async function registerOwner(req, res) {
           },
         },
       },
-      include: {
+      select: {
+        id: true, // Include any other fields you need
+        name: true,
+        email: true,
+        role: true,
         owner: true,
       },
     });
@@ -118,8 +122,7 @@ export async function login(req, res) {
     );
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      sameSite: "None",
-      secure: false,
+      sameSite: "Strict",
       maxAge: 24 * 60 * 60 * 1000,
     });
     res.status(200).json({
@@ -136,14 +139,13 @@ export async function login(req, res) {
 
 export async function generateRefreshToken(req, res) {
   const cookies = req.cookies;
+  console.log(cookies);
   if (!cookies?.refreshToken)
     return res.status(401).send({
       status: "error",
-      message: "Invalid Cookie",
+      message: ["Invalid Cookie"],
     });
   const refreshToken = cookies.refreshToken;
-  const secret = req.csrfSecret;
-  const csrfToken = tokens.create(secret);
 
   try {
     const data = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
@@ -154,7 +156,7 @@ export async function generateRefreshToken(req, res) {
     );
     res.status(200).json({
       status: "success",
-      data: { accessToken, csrfToken },
+      data: { accessToken },
     });
   } catch (error) {
     return res.sendStatus(403);

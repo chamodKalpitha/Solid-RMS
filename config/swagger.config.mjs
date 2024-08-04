@@ -9,6 +9,7 @@ const swaggerOptions = {
     servers: [
       {
         url: "http://localhost:3500",
+        description: "Development server", // Optional description
       },
     ],
     components: {
@@ -34,7 +35,7 @@ const swaggerOptions = {
       },
     ],
   },
-  apis: ["./routes/*.mjs"], // Path to your API routes
+  apis: ["./route/*.mjs"], // Path to your API routes
 };
 
 export default swaggerOptions;

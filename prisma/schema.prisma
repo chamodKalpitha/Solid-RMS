@@ -99,11 +99,13 @@ model Outlet {
   id       Int    @id @default(autoincrement())
   location String
   ownerId  Int    @map("owner_id")
+  menuId   Int?   @map("menu_id")
 
   owner     Owner      @relation(fields: [ownerId], references: [id])
   manager   Manager?
   employees Employee[]
   inventory Inventory?
+  menu      Menu?      @relation(fields: [menuId], references: [id]) // Adding the relation to Menu
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -196,11 +198,11 @@ model Menu {
 
   owner      Owner      @relation(fields: [ownerId], references: [id])
   menuDishes MenuDish[]
+  outlets    Outlet[]
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@unique([ownerId,name])
+  @@unique([ownerId, name])
 }
 
 model MenuDish {

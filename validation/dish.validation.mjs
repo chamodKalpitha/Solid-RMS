@@ -31,9 +31,8 @@ export default Joi.object({
           "number.integer": "Ingredient ID should be an integer",
           "any.required": "Ingredient ID is a required field",
         }),
-        quantity: Joi.number().integer().required().messages({
+        quantity: Joi.number().required().messages({
           "number.base": "Quantity should be a number",
-          "number.integer": "Quantity should be an integer",
           "any.required": "Quantity is a required field",
         }),
       })

@@ -32,8 +32,10 @@ export async function createMenu(req, res) {
 
     const existingMenu = await prisma.menu.findUnique({
       where: {
-        ownerId: ownerId,
-        name: normalizedName,
+        ownerId_name: {
+          ownerId: ownerId,
+          name: normalizedName,
+        },
       },
     });
 

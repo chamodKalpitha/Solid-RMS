@@ -20,7 +20,7 @@ export async function createDish(req, res) {
     const ingredientIds = ingredients.map((ingredient) => ingredient.id);
     const ingredientSet = new Set(ingredientIds);
 
-    if (ingredientIds.length !== ingredientSet.length)
+    if (ingredientIds.length !== ingredientSet.size)
       errors.push("There are duplicate ingredients");
 
     const validIngredients = await prisma.ingredient.findMany({
@@ -37,8 +37,10 @@ export async function createDish(req, res) {
     // Check if the dish already exists
     const existingDish = await prisma.dish.findUnique({
       where: {
-        ownerId: ownerId,
-        name: normalizedName,
+        ownerId_name: {
+          ownerId: ownerId,
+          name: normalizedName,
+        },
       },
     });
 
@@ -80,15 +82,15 @@ export async function createDish(req, res) {
 }
 
 export async function getAllDishes(req, res) {
-  const ownerId = req.ownerId || 1;
-
-  console.log(req.user);
+  const ownerId = req.ownerId;
 
   try {
-    const allDishes = await prisma.dish.findMany();
-    if (allDishes) {
-      res.status(200).json({ status: "success", data: allDishes });
-    }
+    const allDishes = await prisma.dish.findMany({
+      where: {
+        ownerId,
+      },
+    });
+    res.status(200).json({ status: "success", data: allDishes });
   } catch (error) {
     if (process.env.NODE_ENV === "development") console.error(err);
     res
