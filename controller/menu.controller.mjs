@@ -17,7 +17,7 @@ export async function createMenu(req, res) {
 
   try {
     const menuSet = new Set(dishIds);
-    if (dishIds.length !== menuSet.length)
+    if (dishIds.length !== menuSet.size)
       errors.push("There are duplicate dishes");
 
     // Check if all provided dish IDs exist

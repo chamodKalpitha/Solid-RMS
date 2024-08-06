@@ -4,6 +4,6 @@ import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
 const router = Router();
 
-router.post("/new", checkRole("OWNER"), createMenu);
+router.post("/add", checkRole("OWNER"), createMenu);
 
 export default router;

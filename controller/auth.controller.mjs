@@ -113,12 +113,12 @@ export async function login(req, res) {
     const accessToken = jwt.sign(
       { id: user.id },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "15m" }
+      { expiresIn: "5d" }
     );
     const refreshToken = jwt.sign(
       { id: user.id },
       process.env.REFRESH_TOKEN_SECRET,
-      { expiresIn: "1d" }
+      { expiresIn: "5d" }
     );
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
@@ -152,7 +152,7 @@ export async function generateRefreshToken(req, res) {
     const accessToken = jwt.sign(
       { username: data.username },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "15m" }
+      { expiresIn: "5d" }
     );
     res.status(200).json({
       status: "success",
