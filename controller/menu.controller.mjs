@@ -68,3 +68,7 @@ export async function createMenu(req, res) {
       .json({ status: "error", message: ["Internal server error"] });
   }
 }
+
+export function editOwner(req,res){
+
+}
