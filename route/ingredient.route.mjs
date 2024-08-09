@@ -12,7 +12,7 @@ const router = Router();
 router.post("/new", checkRole(["OWNER", "MANAGER"]), createIngredient);
 router.delete("/delete/:id", checkRole(["OWNER"]), deleteIngredient);
 router.get("/get", checkRole(["OWNER", "MANAGER"]), getIngredients);
-router.patch("/:id", checkRole(["OWNER", "MANAGER"]), updateIngredient);
+router.patch("/edit/:id", checkRole(["OWNER", "MANAGER"]), updateIngredient);
 
 export default router;
 
@@ -117,7 +117,7 @@ export default router;
 
 /**
  * @swagger
- * /api/v1/ingredient/{id}:
+ * /api/v1/ingredient/delete/{id}:
  *   delete:
  *     tags:
  *       - Ingredient
@@ -219,7 +219,7 @@ export default router;
 
 /**
  * @swagger
- * /api/v1/ingredient:
+ * /api/v1/ingredient/all:
  *   get:
  *     tags:
  *       - Ingredient
@@ -301,7 +301,7 @@ export default router;
 
 /**
  * @swagger
- * /api/v1/ingredient/{id}:
+ * /api/v1/ingredient/edit/{id}:
  *   patch:
  *     tags:
  *       - Ingredient

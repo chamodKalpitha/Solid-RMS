@@ -9,7 +9,7 @@ import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 const router = Router();
 
 router.get("/all", checkRole(["ADMIN"]), getAllOwners);
-router.get("/:id", checkRole(["ADMIN", "MANAGER"]), getOwnerById);
+router.get("/getById/:id", checkRole(["ADMIN", "MANAGER"]), getOwnerById);
 router.patch("/edit", checkRole(["ADMIN", "OWNER"]), updateOwner);
 
 export default router;
