@@ -56,7 +56,7 @@ export async function createIngredient(req, res) {
 
 //Get Ingredeints
 export async function getIngredients(req, res) {
-  const ownerId = req.ownerId;
+  const ownerId = req.user.ownerId;
 
   try {
     // Find all ingredients for the owner
@@ -87,7 +87,7 @@ export async function updateIngredient(req, res) {
   const { error: idError, value: idValue } = idSchema.validate(req.params);
 
   const { id } = idValue;
-  const ownerId = req.ownerId;
+  const ownerId = req.user.ownerId;
 
   if (idError) {
     const errorMessages = idError.details.map((err) => err.message);
@@ -138,7 +138,7 @@ export async function deleteIngredient(req, res) {
   const { error, value } = idSchema.validate(req.params);
 
   const { id } = value;
-  const ownerId = req.ownerId;
+  const ownerId = req.user.ownerId;
 
   if (error) {
     const errorMessages = error.details.map((err) => err.message);
