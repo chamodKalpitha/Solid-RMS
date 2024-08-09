@@ -71,9 +71,12 @@ export async function createManager(req, res) {
       },
     });
 
+    // Destructure to remove the password field
+    const { password, ...managerWithoutPassword } = newManager;
+
     return res.status(201).json({
       status: "success",
-      data: newManager,
+      data: managerWithoutPassword,
     });
   } catch (err) {
     if (process.env.NODE_ENV === "development") console.error(err);

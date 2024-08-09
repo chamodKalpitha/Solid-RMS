@@ -29,7 +29,7 @@ export async function addSupplierOrder(req, res) {
     const ingredientIds = ingredients.map((item) => item.ingredientId);
 
     const ingredientSet = new Set(ingredientIds);
-    if (ingredientIds.length !== ingredientSet.length)
+    if (ingredientIds.length !== ingredientSet.size)
       errors.push("There are duplicate Inventory Items");
 
     const validIngredientsOwner = await prisma.ingredient.findMany({

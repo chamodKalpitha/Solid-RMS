@@ -10,7 +10,7 @@ const router = Router();
 
 router.post("/register", registerOwner);
 router.post("/login", generateCsrfToken, login);
-router.post("/refresh-token", generateRefreshToken);
+router.get("/refresh-token", generateRefreshToken);
 
 export default router;
 
@@ -140,6 +140,7 @@ export default router;
  *                     type: string
  *                   example:
  *                     - 'Business registration number already exists'
+ *                     - 'Contact Number already exists'
  *                     - 'Email already exists'
  *       '500':
  *         description: Internal server error
@@ -224,23 +225,6 @@ export default router;
  *                   example:
  *                     - 'Email is required'
  *                     - 'Password is required'
- *       '401':
- *         description: Unauthorized, invalid email or password
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: 'error'
- *                 message:
- *                   type: array
- *                   items:
- *                     type: string
- *                   example:
- *                     - 'The email or password you entered is incorrect. Please try again.'
- *
  *       '500':
  *         description: Internal server error
  *         content:
@@ -262,7 +246,7 @@ export default router;
 /**
  * @swagger
  * /api/v1/auth/refresh-token:
- *   post:
+ *   get:
  *     tags:
  *       - User
  *     summary: Generate a new access token using a refresh token
@@ -321,20 +305,4 @@ export default router;
  *                   example:
  *                     - 'Forbidden'
  *
- *       '500':
- *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: 'error'
- *                 message:
- *                   type: array
- *                   items:
- *                     type: string
- *                   example:
- *                     - 'Internal server error'
  */

@@ -159,6 +159,9 @@ export async function generateRefreshToken(req, res) {
       data: { accessToken },
     });
   } catch (error) {
-    return res.sendStatus(403);
+    return res.status(403).send({
+      status: "error",
+      message: ["Forbidden"],
+    });
   }
 }

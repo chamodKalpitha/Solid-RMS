@@ -3,8 +3,8 @@ import inventoryRequestSchema from "../validation/inventoryRequest.validation.mj
 import "dotenv/config";
 
 export async function addInventoryRequest(req, res) {
-  const managerId = req.managerId;
-  const ownerId = req.ownerId;
+  let managerId = req.user.managerId;
+  const ownerId = req.user.ownerId;
   const { error, value } = inventoryRequestSchema.validate(req.body);
   const { ingredients } = value;
   let errors = [];
@@ -33,7 +33,7 @@ export async function addInventoryRequest(req, res) {
     const ingredientIds = ingredients.map((item) => item.ingredientId);
 
     const ingredientSet = new Set(ingredientIds);
-    if (ingredientIds.length !== ingredientSet.length)
+    if (ingredientIds.length !== ingredientSet.size)
       errors.push("There are duplicate Inventory Items");
 
     const validIngredients = await prisma.ingredient.findMany({

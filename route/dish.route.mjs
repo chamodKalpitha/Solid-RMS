@@ -14,7 +14,7 @@ export default router;
  * /api/v1/dish/new:
  *   post:
  *     tags:
- *       - Dishes
+ *       - Dish
  *     summary: Create a new dish
  *     description: Creates a new dish and links it to the provided ingredients.
  *     requestBody:
@@ -124,7 +124,7 @@ export default router;
  * /api/v1/dish/all:
  *   get:
  *     tags:
- *       - Dishes
+ *       - Dish
  *     summary: Retrieve all dishes
  *     description: Retrieves all dishes associated with the authenticated owner.
  *     responses:

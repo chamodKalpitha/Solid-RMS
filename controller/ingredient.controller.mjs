@@ -72,12 +72,7 @@ export async function getIngredients(req, res) {
       });
     }
 
-    const responseData = ingredients.map((ingredient) => ({
-      ingredientName: ingredient.name,
-      unit: ingredient.unit,
-    }));
-
-    return res.status(200).json({ status: "success", data: responseData });
+    return res.status(200).json({ status: "success", data: ingredients });
   } catch (error) {
     if (process.env.NODE_ENV === "development") console.error(error);
     res

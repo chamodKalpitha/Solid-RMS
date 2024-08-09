@@ -132,3 +132,4 @@ dist
 #prisma
 prisma/migrations/*
 
+.github/workflows

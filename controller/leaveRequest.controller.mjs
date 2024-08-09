@@ -3,8 +3,8 @@ import leaveRequestSchema from "../validation/leaveRequest.validation.mjs";
 import "dotenv/config";
 
 export async function addLeaveRequest(req, res) {
-  const managerId = req.managerId;
-  const ownerId = req.ownerId;
+  let managerId = req.user.managerId;
+  const ownerId = req.user.ownerId;
   const { error, value } = leaveRequestSchema.validate(req.body);
   const { type, from, noOfDate, reason, employeeId } = value;
 
