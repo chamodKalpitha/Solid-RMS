@@ -1,4 +1,5 @@
 import prisma from "../prisma/prismaClient.mjs";
+import { hashPassword } from "../utilts/bcrypt.utilts.mjs";
 import managerSchema from "../validation/manager.validation.mjs";
 import "dotenv/config";
 
@@ -52,11 +53,13 @@ export async function createManager(req, res) {
       return res.status(400).json({ status: "error", message: errors });
     }
 
+    const hashedPassword = hashPassword(user.password);
+
     const newManager = await prisma.user.create({
       data: {
         name: user.name,
         email: user.email,
-        password: user.password,
+        password: hashedPassword,
         role: user.role,
         manager: {
           create: {
