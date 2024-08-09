@@ -71,3 +71,38 @@ export const idSchema = Joi.object({
     "any.required": "ID is required",
   }),
 });
+
+
+export const updateOwnerSchema = Joi.object({
+  brNo: Joi.string().optional().messages({
+    "string.empty": "Business registration number is required.",
+  }),
+  companyName: Joi.string().optional().messages({
+    "string.empty": "Company name is required.",
+  }),
+  address: Joi.string().optional().messages({
+    "string.base": "Address must be a string.",
+  }),
+  url: Joi.string()
+    .uri({
+      scheme: ["http", "https"],
+    })
+    .optional()
+    .messages({
+      "string.uri": "The URL must be a valid HTTP or HTTPS URL.",
+    }),
+  contactNo: Joi.string().optional().messages({
+    "string.empty": "Contact number is required.",
+  }),
+  user: Joi.object({
+    name: Joi.string().optional().messages({
+      "string.empty": "User name is required.",
+    }),
+    email: Joi.string().email().optional().messages({
+      "string.empty": "Email is required.",
+      "string.email": "Email must be a valid email address.",
+    }),
+  }).optional(),
+}).options({
+  abortEarly: false,
+});
