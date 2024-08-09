@@ -228,3 +228,123 @@ export default router;
  *                   example:
  *                     - "Internal server error"
  */
+
+/**
+ * @swagger
+ * /api/v1/owner/edit:
+ *   patch:
+ *     tags:
+ *       - Owner
+ *     summary: Update owner and associated user details
+ *     description: Updates the details of the authenticated owner and/or associated user.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               brNo:
+ *                 type: string
+ *                 example: "BR123456"
+ *               companyName:
+ *                 type: string
+ *                 example: "Solid Restaurant"
+ *               address:
+ *                 type: string
+ *                 example: "330/A Boralesgamuwa, Dehiwala"
+ *               contactNo:
+ *                 type: string
+ *                 example: "+94702375050"
+ *               url:
+ *                 type: string
+ *                 example: "http://example.com/updated-url.jpg"
+ *               user:
+ *                 type: object
+ *                 properties:
+ *                   name:
+ *                     type: string
+ *                     example: "Ravindu Akalanka"
+ *                   email:
+ *                     type: string
+ *                     example: "ravinduakalankazoysa@gmail.com"
+ *     responses:
+ *       '200':
+ *         description: Successfully updated the owner and/or user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "success"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     updatedOwner:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: integer
+ *                           example: 1
+ *                         brNo:
+ *                           type: string
+ *                           example: "BR123456"
+ *                         companyName:
+ *                           type: string
+ *                           example: "Solid Restaurant"
+ *                         address:
+ *                           type: string
+ *                           example: "330/A Boralesgamuwa, Dehiwala"
+ *                         contactNo:
+ *                           type: string
+ *                           example: "+94702375050"
+ *                         url:
+ *                           type: string
+ *                           example: "http://example.com/updated-url.jpg"
+ *                         createdAt:
+ *                           type: string
+ *                           format: date-time
+ *                           example: "2024-08-03T17:03:17.431Z"
+ *                         updatedAt:
+ *                           type: string
+ *                           format: date-time
+ *                           example: "2024-08-03T17:03:17.431Z"
+ *                     updatedUser:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: integer
+ *                           example: 1
+ *                         name:
+ *                           type: string
+ *                           example: "Ravindu Akalanka"
+ *                         email:
+ *                           type: string
+ *                           example: "ravinduakalankazoysa@gmail.com"
+ *                         createdAt:
+ *                           type: string
+ *                           format: date-time
+ *                           example: "2024-08-03T17:03:17.431Z"
+ *                         updatedAt:
+ *                           type: string
+ *                           format: date-time
+ *                           example: "2024-08-03T17:03:17.431Z"
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Internal server error"]
+ */
+
