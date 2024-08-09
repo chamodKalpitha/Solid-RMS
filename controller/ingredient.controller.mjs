@@ -1,5 +1,9 @@
 import prisma from "../prisma/prismaClient.mjs";
-import { createnew } from "../validation/ingredient.validation.mjs";
+import {
+  createnew,
+  idSchema,
+  ingredientUpdateSchema,
+} from "../validation/ingredient.validation.mjs";
 import "dotenv/config";
 
 export async function createIngredient(req, res) {
