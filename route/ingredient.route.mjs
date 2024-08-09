@@ -117,7 +117,7 @@ export default router;
 
 /**
  * @swagger
- * /api/v1/ingredient/{id}:
+ * /api/v1/ingredient/delete/{id}:
  *   delete:
  *     tags:
  *       - Ingredient
@@ -219,7 +219,7 @@ export default router;
 
 /**
  * @swagger
- * /api/v1/ingredient:
+ * /api/v1/ingredient/all:
  *   get:
  *     tags:
  *       - Ingredient
@@ -301,7 +301,7 @@ export default router;
 
 /**
  * @swagger
- * /api/v1/ingredient/{id}:
+ * /api/v1/ingredient/edit/{id}:
  *   patch:
  *     tags:
  *       - Ingredient
