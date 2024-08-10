@@ -1,9 +1,14 @@
 import { Router } from "express";
-import { addInventoryRequest } from "../controller/inventoryRequest.controller.mjs";
+import {
+  addInventoryRequest,
+  getAllInventoryRequest,
+} from "../controller/inventoryRequest.controller.mjs";
+import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
 const router = Router();
 
-router.post("/add", addInventoryRequest);
+router.post("/add", checkRole(["OWNER", "MANAGER"]), addInventoryRequest);
+router.get("/all", checkRole(["OWNER", "MANAGER"]), getAllInventoryRequest);
 
 export default router;
 
@@ -12,7 +17,7 @@ export default router;
  * /api/v1/inventoryRequest/add:
  *   post:
  *     tags:
- *       - Inventory Requests
+ *       - Inventory Request
  *     summary: Create a new inventory request
  *     description: Creates a new inventory request for the authenticated owner or manager.
  *     requestBody:
@@ -130,6 +135,113 @@ export default router;
  *                   items:
  *                     type: string
  *                   example: ["There are duplicate Inventory Items", "One or more ingredients are invalid or not authorized"]
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Internal server error"]
+ */
+
+/**
+ * @swagger
+ * /api/v1/inventoryRequest/all:
+ *   get:
+ *     tags:
+ *       - Inventory Request
+ *     summary: Get all inventory requests
+ *     description: Retrieves a list of inventory requests associated with the authenticated owner, with pagination support.
+ *     parameters:
+ *       - in: query
+ *         name: cursor
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: The cursor for pagination, representing the last inventory request ID from the previous page.
+ *         example: 10
+ *       - in: query
+ *         name: take
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: The number of inventory requests to retrieve. Defaults to 10 if not provided.
+ *         example: 10
+ *     responses:
+ *       '200':
+ *         description: Successfully retrieved the list of inventory requests
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "success"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     inventoryRequest:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                             example: 1
+ *                           ownerId:
+ *                             type: integer
+ *                             example: 1
+ *                           managerId:
+ *                             type: integer
+ *                             example: 1
+ *                           status:
+ *                             type: string
+ *                             example: "PENDING"
+ *                           createdAt:
+ *                             type: string
+ *                             format: date-time
+ *                             example: "2024-08-10T17:59:07.262Z"
+ *                           updatedAt:
+ *                             type: string
+ *                             format: date-time
+ *                             example: "2024-08-10T17:58:52.734Z"
+ *                           requestIngredients:
+ *                             type: array
+ *                             items:
+ *                               type: object
+ *                               properties:
+ *                                 id:
+ *                                   type: integer
+ *                                   example: 1
+ *                                 inventoryRequestId:
+ *                                   type: integer
+ *                                   example: 1
+ *                                 ingredientId:
+ *                                   type: integer
+ *                                   example: 1
+ *                                 quantity:
+ *                                   type: integer
+ *                                   example: 1000
+ *                                 createdAt:
+ *                                   type: string
+ *                                   format: date-time
+ *                                   example: "2024-08-10T17:59:33.696Z"
+ *                                 updatedAt:
+ *                                   type: string
+ *                                   format: date-time
+ *                                   example: "2024-08-10T17:59:25.058Z"
+ *                     nextCursor:
+ *                       type: integer
+ *                       example: null
  *       '500':
  *         description: Internal server error
  *         content:
