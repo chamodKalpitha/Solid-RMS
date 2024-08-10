@@ -29,7 +29,7 @@ export async function getAllOwners(req, res) {
 
     res.status(200).json({ status: "success", data: { clients, nextCursor } });
   } catch (error) {
-    if (process.env.NODE_ENV === "development") console.error(err);
+    if (process.env.NODE_ENV === "development") console.error(error);
     res
       .status(500)
       .json({ status: "error", message: ["Internal server error"] });
@@ -63,14 +63,15 @@ export const getOwnerById = async (req, res) => {
   }
 };
 
-
 //Update Owner
 
 export const updateOwner = async (req, res) => {
   const ownerId = req.user.ownerId;
   const userId = req.user.id;
 
-  const { error: updateError, value: updateValue } = updateOwnerSchema.validate(req.body);
+  const { error: updateError, value: updateValue } = updateOwnerSchema.validate(
+    req.body
+  );
 
   if (updateError) {
     const errorRespond = updateError.details.map((err) => err.message);
@@ -147,6 +148,7 @@ export const updateOwner = async (req, res) => {
       return { updatedUser, updatedOwner };
     });
 
+
     const responseData = {
       ...(updatedUser && { updatedUser }),
       ...(updatedOwner && { updatedOwner }),
@@ -155,6 +157,8 @@ export const updateOwner = async (req, res) => {
     res.status(200).json({ status: "success", data: responseData });
   } catch (error) {
     if (process.env.NODE_ENV === "development") console.error(error);
-    res.status(500).json({ status: "error", message: ["Internal server error"] });
+    res
+      .status(500)
+      .json({ status: "error", message: ["Internal server error"] });
   }
 };
