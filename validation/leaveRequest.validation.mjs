@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-export default Joi.object({
+export const createLeaveRequestSchema = Joi.object({
   type: Joi.string()
     .valid("SICK", "CASUAL", "NOPAY", "SHORT", "HALFDAY")
     .required()
@@ -32,6 +32,19 @@ export default Joi.object({
     "number.base": "Manager ID must be a number.",
     "number.integer": "Manager ID must be an integer.",
     "number.positive": "Manager ID must be a positive number.",
+  }),
+}).options({
+  abortEarly: false,
+});
+
+export const getAllLeaveRequestSchema = Joi.object({
+  cursor: Joi.string().optional().messages({
+    "string.base": "Cursor must be a string",
+  }),
+  take: Joi.number().integer().positive().optional().default(10).messages({
+    "number.base": "Take must be a number",
+    "number.integer": "Take must be an integer",
+    "number.positive": "Take must be a positive number",
   }),
 }).options({
   abortEarly: false,

@@ -1,9 +1,14 @@
 import { Router } from "express";
-import { addLeaveRequest } from "../controller/leaveRequest.controller.mjs";
+import {
+  addLeaveRequest,
+  getAllLeaveRequest,
+} from "../controller/leaveRequest.controller.mjs";
+import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
 const router = Router();
 
-router.post("/add", addLeaveRequest);
+router.post("/add", checkRole(["OWNER"]), addLeaveRequest);
+router.get("/all", checkRole(["OWNER"]), getAllLeaveRequest);
 
 export default router;
 
@@ -12,7 +17,7 @@ export default router;
  * /api/v1/leaveRequest/add:
  *   post:
  *     tags:
- *       - Leave Requests
+ *       - Leave Request
  *     summary: Create a new leave request
  *     description: Creates a new leave request for an employee by the authenticated manager or owner.
  *     requestBody:
@@ -141,6 +146,154 @@ export default router;
  *                   items:
  *                     type: string
  *                   example: ["Invalid Employee ID or not authorized"]
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Internal server error"]
+ */
+
+/**
+ * @swagger
+ * /api/v1/leaveRequest/all:
+ *   get:
+ *     tags:
+ *       - Leave Request
+ *     summary: Get all leave requests
+ *     description: Retrieves a list of leave requests associated with the authenticated owner, with pagination support.
+ *     parameters:
+ *       - in: query
+ *         name: cursor
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: The cursor for pagination, representing the last leave request ID from the previous page.
+ *         example: 10
+ *       - in: query
+ *         name: take
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: The number of leave requests to retrieve. Defaults to 10 if not provided.
+ *         example: 10
+ *     responses:
+ *       '200':
+ *         description: Successfully retrieved the list of leave requests
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "success"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     leaveRequest:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                             example: 1
+ *                           type:
+ *                             type: string
+ *                             example: "SICK"
+ *                           from:
+ *                             type: string
+ *                             format: date-time
+ *                             example: "1970-01-01T00:00:00.000Z"
+ *                           noOfDate:
+ *                             type: integer
+ *                             example: 5
+ *                           reason:
+ *                             type: string
+ *                             example: "Neck hurt"
+ *                           status:
+ *                             type: string
+ *                             example: "PENDING"
+ *                           employeeId:
+ *                             type: integer
+ *                             example: 1
+ *                           managerId:
+ *                             type: integer
+ *                             example: 1
+ *                           ownerId:
+ *                             type: integer
+ *                             example: 1
+ *                           createdAt:
+ *                             type: string
+ *                             format: date-time
+ *                             example: "2024-08-10T18:04:03.899Z"
+ *                           updatedAt:
+ *                             type: string
+ *                             format: date-time
+ *                             example: "2024-08-10T18:04:15.020Z"
+ *                           employee:
+ *                             type: object
+ *                             properties:
+ *                               id:
+ *                                 type: integer
+ *                                 example: 1
+ *                               name:
+ *                                 type: string
+ *                                 example: "Chamod Weerasinghe"
+ *                               nicNo:
+ *                                 type: string
+ *                                 example: "123456789V"
+ *                               address:
+ *                                 type: string
+ *                                 example: "123 Main St"
+ *                               contactNo:
+ *                                 type: string
+ *                                 example: "0771234567"
+ *                               emgConNo:
+ *                                 type: string
+ *                                 example: "0777654321"
+ *                               emgConName:
+ *                                 type: string
+ *                                 example: "Jane Doe"
+ *                               designation:
+ *                                 type: string
+ *                                 example: "Manager"
+ *                               isCritical:
+ *                                 type: boolean
+ *                                 example: true
+ *                               salary:
+ *                                 type: number
+ *                                 example: 50000
+ *                               url:
+ *                                 type: string
+ *                                 example: "http://example.com/profile-picture.jpg"
+ *                               ownerId:
+ *                                 type: integer
+ *                                 example: 1
+ *                               outletId:
+ *                                 type: integer
+ *                                 example: 1
+ *                               createdAt:
+ *                                 type: string
+ *                                 format: date-time
+ *                                 example: "2024-08-10T07:38:21.857Z"
+ *                               updatedAt:
+ *                                 type: string
+ *                                 format: date-time
+ *                                 example: "2024-08-10T15:55:58.099Z"
+ *                     nextCursor:
+ *                       type: integer
+ *                       example: null
  *       '500':
  *         description: Internal server error
  *         content:
