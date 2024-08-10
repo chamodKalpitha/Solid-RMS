@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-export default Joi.object({
+export const createManagerSchema = Joi.object({
   status: Joi.string().valid("ACTIVE", "INACTIVE").default("ACTIVE").messages({
     "any.only": "Status must be either ACTIVE or INACTIVE",
   }),
@@ -29,6 +29,19 @@ export default Joi.object({
       "any.empty": "User is required.",
       "any.required": "User is required.",
     }),
+}).options({
+  abortEarly: false,
+});
+
+export const getAllManagerSchema = Joi.object({
+  cursor: Joi.string().optional().messages({
+    "string.base": "Cursor must be a string",
+  }),
+  take: Joi.number().integer().positive().optional().default(10).messages({
+    "number.base": "Take must be a number",
+    "number.integer": "Take must be an integer",
+    "number.positive": "Take must be a positive number",
+  }),
 }).options({
   abortEarly: false,
 });
