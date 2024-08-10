@@ -7,8 +7,8 @@ import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
 const router = Router();
 
-router.post("/add", checkRole("OWNER"), addItemToInventory);
-router.get("/getById/:outletId", checkRole("OWNER"), getInventoryById);
+router.post("/add", checkRole(["OWNER"]), addItemToInventory);
+router.get("/getById/:outletId", checkRole(["OWNER"]), getInventoryById);
 
 export default router;
 
