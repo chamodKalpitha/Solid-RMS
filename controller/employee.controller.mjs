@@ -2,6 +2,7 @@ import prisma from "../prisma/prismaClient.mjs";
 import {
   createEmployeeSchema,
   employeeIdSchema,
+  getAllEmployeechema,
   updateEmployeeSchema,
 } from "../validation/employee.validation.mjs";
 import "dotenv/config";
@@ -75,6 +76,40 @@ export async function createEmployee(req, res) {
     });
   } catch (err) {
     if (process.env.NODE_ENV === "development") console.error(err);
+    res
+      .status(500)
+      .json({ status: "error", message: ["Internal server error"] });
+  }
+}
+
+export async function getAllEmployee(req, res) {
+  try {
+    const { error, value } = getAllEmployeechema.validate(req.query);
+
+    if (error) {
+      const errorRespond = error.details.map((err) => err.message);
+      return res.status(400).json({ status: "error", message: errorRespond });
+    }
+    const { cursor, take } = value;
+    const takeNumber = parseInt(take) || 10;
+    const cursorObject = cursor ? { id: parseInt(cursor) } : undefined;
+
+    const employees = await prisma.employee.findMany({
+      take: takeNumber,
+      skip: cursorObject ? 1 : 0,
+      cursor: cursorObject,
+    });
+
+    const nextCursor =
+      employees.length === takeNumber
+        ? employees[employees.length - 1].id
+        : null;
+
+    res
+      .status(200)
+      .json({ status: "success", data: { employees, nextCursor } });
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") console.error(error);
     res
       .status(500)
       .json({ status: "error", message: ["Internal server error"] });

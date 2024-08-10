@@ -2,13 +2,15 @@ import { Router } from "express";
 import {
   createEmployee,
   updateEmplyee,
+  getAllEmployee,
 } from "../controller/employee.controller.mjs";
 import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
 const router = Router();
 
-router.post("/new", checkRole("OWNER"), createEmployee);
-router.patch("/edit/:id", checkRole("OWNER"), updateEmplyee);
+router.post("/new", checkRole(["OWNER"]), createEmployee);
+router.get("/all", checkRole(["OWNER", "MANAGER"]), getAllEmployee);
+router.patch("/edit/:id", checkRole(["OWNER"]), updateEmplyee);
 
 export default router;
 
