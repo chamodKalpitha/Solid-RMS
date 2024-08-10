@@ -190,3 +190,42 @@ export async function updateEmplyee(req, res) {
       .json({ status: "error", message: ["Internal server error"] });
   }
 }
+
+export async function deleteEmployee(req, res) {
+  const ownerId = req.user.ownerId;
+  const { error, value } = employeeIdSchema.validate(req.params);
+  const { id } = value;
+
+  if (error) {
+    const errorRespond = error.details.map((err) => err.message);
+    return res.status(400).json({ status: "error", message: errorRespond });
+  }
+
+  try {
+    const existingEmployee = await prisma.employee.findUnique({
+      where: { id },
+    });
+
+    if (!existingEmployee) {
+      return res
+        .status(404)
+        .json({ status: "error", message: ["Invalid Employee Id"] });
+    }
+
+    if (existingEmployee.ownerId !== ownerId) {
+      return res.status(403).json({
+        status: "error",
+        message: ["Invalid Employee Id"],
+      });
+    }
+    const employeeDelete = await prisma.employee.delete({
+      where: { id },
+    });
+    return res.status(200).json({ status: "success", data: employeeDelete });
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") console.error(error);
+    res
+      .status(500)
+      .json({ status: "error", message: ["Internal server error"] });
+  }
+}
