@@ -1,10 +1,13 @@
 import prisma from "../prisma/prismaClient.mjs";
-import inventorySchema from "../validation/inventory.validation.mjs";
+import {
+  addItemSchema,
+  outletIdSchema,
+} from "../validation/inventory.validation.mjs";
 import "dotenv/config";
 
 export async function addItemToInventory(req, res) {
   const ownerId = req.user.ownerId;
-  const { error, value } = inventorySchema.validate(req.body);
+  const { error, value } = addItemSchema.validate(req.body);
   const { inventoryId, items } = value;
   let errors = [];
 
@@ -86,6 +89,46 @@ export async function addItemToInventory(req, res) {
   } catch (err) {
     console.error(err);
     return res
+      .status(500)
+      .json({ status: "error", message: ["Internal server error"] });
+  }
+}
+
+export async function getInventoryById(req, res) {
+  const ownerId = req.user.ownerId;
+
+  try {
+    const { error, value } = outletIdSchema.validate(req.params);
+
+    if (error) {
+      const errorRespond = error.details.map((err) => err.message);
+      return res.status(400).json({ status: "error", message: errorRespond });
+    }
+    const { outletId } = value;
+
+    const outlet = await prisma.outlet.findUnique({
+      where: {
+        id: outletId,
+        ownerId,
+      },
+      include: {
+        inventory: {
+          include: {
+            inventoryIngredients: true,
+          },
+        },
+      },
+    });
+
+    if (!outlet) {
+      return res
+        .status(400)
+        .json({ status: "error", message: ["Invalid Outlet Id"] });
+    }
+    res.status(200).json({ status: "success", data: outlet });
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") console.error(error);
+    res
       .status(500)
       .json({ status: "error", message: ["Internal server error"] });
   }
