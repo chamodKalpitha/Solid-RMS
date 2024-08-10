@@ -1,3 +1,4 @@
+import { where } from "@sequelize/core";
 import prisma from "../prisma/prismaClient.mjs";
 import {
   getAllClientSchema,
@@ -77,12 +78,48 @@ export const updateOwner = async (req, res) => {
   }
 
   const { user, ...ownerData } = updateValue;
+  const duplicateErrors = [];
 
   try {
+    if (user) {
+      if (user.email) {
+        const existingUserEmail = await prisma.user.findFirst({
+          where: {
+            email: user.email,
+            id: { not: userId },
+          },
+        });
+        if (existingUserEmail) duplicateErrors.push("Email is already in use.");
+      }
+    }
+
+    if (ownerData.brNo) {
+      const existingOwnerBrNo = await prisma.owner.findFirst({
+        where: {
+          brNo: ownerData.brNo,
+          id: { not: ownerId },
+        },
+      });
+      if (existingOwnerBrNo) duplicateErrors.push("BR Number is already in use.");
+    }
+
+    if(ownerData.contactNo){
+      const existingOwnerContactNo = await prisma.owner.findFirst({
+        where:{
+          contactNo:ownerData.contactNo,
+          id: {not: ownerId}
+        }
+      });
+      if(existingOwnerContactNo) duplicateErrors.push("Contact Number is already in use.");
+    }
+
+    if (duplicateErrors.length > 0) {
+      return res.status(400).json({ status: "error", message: duplicateErrors });
+    }
+
     const { updatedUser, updatedOwner } = await prisma.$transaction(async (prisma) => {
-     
-     
-      let updatedUser
+
+      let updatedUser;
       if (user) {
         updatedUser = await prisma.user.update({
           where: { id: userId },
@@ -94,20 +131,19 @@ export const updateOwner = async (req, res) => {
             id: true,
             name: true,
             email: true,
-            createdAt:true,
-            updatedAt:true
+            createdAt: true,
+            updatedAt: true,
           },
         });
       }
 
-      let updatedOwner
+      let updatedOwner;
       if (Object.keys(ownerData).length > 0) {
         updatedOwner = await prisma.owner.update({
           where: { id: ownerId },
           data: ownerData,
         });
       }
-
       return { updatedUser, updatedOwner };
     });
 
