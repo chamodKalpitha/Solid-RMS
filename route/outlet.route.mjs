@@ -1,10 +1,14 @@
 import { Router } from "express";
-import { createOutlet } from "../controller/outlet.controller.mjs";
+import {
+  createOutlet,
+  getAllOutlet,
+} from "../controller/outlet.controller.mjs";
 import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
 const router = Router();
 
-router.post("/new", checkRole("OWNER"), createOutlet);
+router.post("/new", checkRole(["OWNER"]), createOutlet);
+router.get("/all", checkRole(["OWNER"]), getAllOutlet);
 
 export default router;
 
