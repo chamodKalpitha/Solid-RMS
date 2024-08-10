@@ -83,6 +83,7 @@ export async function createEmployee(req, res) {
 }
 
 export async function getAllEmployee(req, res) {
+  const ownerId = req.user.ownerId;
   try {
     const { error, value } = getAllEmployeechema.validate(req.query);
 
@@ -98,6 +99,9 @@ export async function getAllEmployee(req, res) {
       take: takeNumber,
       skip: cursorObject ? 1 : 0,
       cursor: cursorObject,
+      where: {
+        ownerId,
+      },
     });
 
     const nextCursor =
