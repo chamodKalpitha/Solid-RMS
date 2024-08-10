@@ -3,6 +3,7 @@ import {
   createEmployee,
   updateEmplyee,
   getAllEmployee,
+  deleteEmployee,
 } from "../controller/employee.controller.mjs";
 import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
@@ -11,6 +12,7 @@ const router = Router();
 router.post("/new", checkRole(["OWNER"]), createEmployee);
 router.get("/all", checkRole(["OWNER", "MANAGER"]), getAllEmployee);
 router.patch("/edit/:id", checkRole(["OWNER"]), updateEmplyee);
+router.delete("/delete/:id", checkRole(["OWNER"]), deleteEmployee);
 
 export default router;
 
