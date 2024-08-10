@@ -96,3 +96,84 @@ export default router;
  *                   example:
  *                     - "Internal server error"
  */
+
+/**
+ * @swagger
+ * /api/v1/outlet/all:
+ *   get:
+ *     summary: Get all outlets
+ *     description: Retrieve a list of outlets for the authenticated owner with pagination support.
+ *     tags:
+ *       - Outlet
+ *     parameters:
+ *       - in: query
+ *         name: cursor
+ *         schema:
+ *           type: integer
+ *         description: The ID of the last outlet from the previous page.
+ *       - in: query
+ *         name: take
+ *         schema:
+ *           type: integer
+ *         description: The number of outlets to retrieve.
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved the list of outlets.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "success"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     outlets:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                             example: 1
+ *                           location:
+ *                             type: string
+ *                             example: "Panadura"
+ *                           ownerId:
+ *                             type: integer
+ *                             example: 1
+ *                           menuId:
+ *                             type: integer
+ *                             nullable: true
+ *                             example: null
+ *                           createdAt:
+ *                             type: string
+ *                             format: date-time
+ *                             example: "2024-08-10T07:35:14.636Z"
+ *                           updatedAt:
+ *                             type: string
+ *                             format: date-time
+ *                             example: "2024-08-10T07:35:14.636Z"
+ *                     nextCursor:
+ *                       type: integer
+ *                       nullable: true
+ *                       example: null
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example:
+ *                     - "Internal server error"
+ */
