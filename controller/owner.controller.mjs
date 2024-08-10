@@ -77,11 +77,48 @@ export const updateOwner = async (req, res) => {
   }
 
   const { user, ...ownerData } = updateValue;
+  const duplicateErrors = [];
 
   try {
-    const { updatedUser, updatedOwner } = await prisma.$transaction(async (prisma) => {
-     
-     
+    if (user) {
+      if (user.email) {
+        const existingUserEmail = await prisma.user.findFirst({
+          where: {
+            email: user.email,
+            id: { not: userId }, 
+          },
+        });
+        if (existingUserEmail) duplicateErrors.push("Email is already in use.");
+      }
+    }
+
+    if (ownerData.brNo) {
+      const existingOwnerBrNo = await prisma.owner.findFirst({
+        where: {
+          brNo: ownerData.brNo,
+          id: { not: ownerId }, 
+        },
+      });
+      if (existingOwnerBrNo) duplicateErrors.push("BR Number is already in use.");
+    }
+
+    if (ownerData.contactNo) {
+      const existingOwnerContactNo = await prisma.owner.findFirst({
+        where: {
+          contactNo: ownerData.contactNo,
+          id: { not: ownerId }, 
+        },
+      });
+      if (existingOwnerContactNo) duplicateErrors.push("Contact Number is already in use.");
+    }
+
+
+    if (duplicateErrors.length > 0) {
+      return res.status(400).json({ status: "error", message: duplicateErrors });
+    }
+
+    
+    const { updatedUser, updatedOwner } = await prisma.$transaction(async (prisma) => {  
       let updatedUser
       if (user) {
         updatedUser = await prisma.user.update({
