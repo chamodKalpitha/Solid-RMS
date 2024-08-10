@@ -28,7 +28,7 @@ export async function getAllOwners(req, res) {
 
     res.status(200).json({ status: "success", data: { clients, nextCursor } });
   } catch (error) {
-    if (process.env.NODE_ENV === "development") console.error(err);
+    if (process.env.NODE_ENV === "development") console.error(error);
     res
       .status(500)
       .json({ status: "error", message: ["Internal server error"] });
@@ -62,14 +62,15 @@ export const getOwnerById = async (req, res) => {
   }
 };
 
-
 //Update Owner
 
 export const updateOwner = async (req, res) => {
   const ownerId = req.user.ownerId;
   const userId = req.user.id;
 
-  const { error: updateError, value: updateValue } = updateOwnerSchema.validate(req.body);
+  const { error: updateError, value: updateValue } = updateOwnerSchema.validate(
+    req.body
+  );
 
   if (updateError) {
     const errorRespond = updateError.details.map((err) => err.message);
@@ -79,37 +80,37 @@ export const updateOwner = async (req, res) => {
   const { user, ...ownerData } = updateValue;
 
   try {
-    const { updatedUser, updatedOwner } = await prisma.$transaction(async (prisma) => {
-     
-     
-      let updatedUser
-      if (user) {
-        updatedUser = await prisma.user.update({
-          where: { id: userId },
-          data: {
-            name: user.name,
-            email: user.email,
-          },
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            createdAt:true,
-            updatedAt:true
-          },
-        });
-      }
+    const { updatedUser, updatedOwner } = await prisma.$transaction(
+      async (prisma) => {
+        let updatedUser;
+        if (user) {
+          updatedUser = await prisma.user.update({
+            where: { id: userId },
+            data: {
+              name: user.name,
+              email: user.email,
+            },
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+          });
+        }
 
-      let updatedOwner
-      if (Object.keys(ownerData).length > 0) {
-        updatedOwner = await prisma.owner.update({
-          where: { id: ownerId },
-          data: ownerData,
-        });
-      }
+        let updatedOwner;
+        if (Object.keys(ownerData).length > 0) {
+          updatedOwner = await prisma.owner.update({
+            where: { id: ownerId },
+            data: ownerData,
+          });
+        }
 
-      return { updatedUser, updatedOwner };
-    });
+        return { updatedUser, updatedOwner };
+      }
+    );
 
     const responseData = {
       ...(updatedUser && { updatedUser }),
@@ -119,6 +120,8 @@ export const updateOwner = async (req, res) => {
     res.status(200).json({ status: "success", data: responseData });
   } catch (error) {
     if (process.env.NODE_ENV === "development") console.error(error);
-    res.status(500).json({ status: "error", message: ["Internal server error"] });
+    res
+      .status(500)
+      .json({ status: "error", message: ["Internal server error"] });
   }
 };
