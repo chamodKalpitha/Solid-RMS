@@ -213,7 +213,7 @@ export async function deleteEmployee(req, res) {
     }
 
     if (existingEmployee.ownerId !== ownerId) {
-      return res.status(403).json({
+      return res.status(404).json({
         status: "error",
         message: ["Invalid Employee Id"],
       });
