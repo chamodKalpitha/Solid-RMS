@@ -304,7 +304,6 @@ export default router;
  *                     type: string
  *                   example: ["Internal server error"]
  */
-
 /**
  * @swagger
  * /api/v1/employee/all:
