@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-export default Joi.object({
+export const addItemSchema = Joi.object({
   inventoryId: Joi.number().integer().required().messages({
     "number.base": "Inventory ID should be a number",
     "number.integer": "Inventory ID should be an integer",
@@ -23,4 +23,13 @@ export default Joi.object({
     .required(),
 }).options({
   abortEarly: false,
+});
+
+export const outletIdSchema = Joi.object({
+  outletId: Joi.number().integer().positive().required().messages({
+    "number.base": "ID must be a number",
+    "number.integer": "ID must be an integer",
+    "number.positive": "ID must be a positive number",
+    "any.required": "ID is required",
+  }),
 });
