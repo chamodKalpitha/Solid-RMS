@@ -1,10 +1,13 @@
 import prisma from "../prisma/prismaClient.mjs";
-import outletSchema from "../validation/outlet.validation.mjs";
+import {
+  createOutletSchema,
+  getAllOutletSchema,
+} from "../validation/outlet.validation.mjs";
 import "dotenv/config";
 
 export async function createOutlet(req, res) {
   const ownerId = req.user.ownerId;
-  const { error, value } = outletSchema.validate(req.body);
+  const { error, value } = createOutletSchema.validate(req.body);
   const { location } = value;
 
   if (error) {
@@ -29,6 +32,41 @@ export async function createOutlet(req, res) {
     });
   } catch (err) {
     if (process.env.NODE_ENV === "development") console.error(err);
+    res
+      .status(500)
+      .json({ status: "error", message: ["Internal server error"] });
+  }
+}
+
+export async function getAllOutlet(req, res) {
+  const ownerId = req.user.ownerId;
+
+  try {
+    const { error, value } = getAllOutletSchema.validate(req.query);
+
+    if (error) {
+      const errorRespond = error.details.map((err) => err.message);
+      return res.status(400).json({ status: "error", message: errorRespond });
+    }
+    const { cursor, take } = value;
+    const takeNumber = parseInt(take) || 10;
+    const cursorObject = cursor ? { id: parseInt(cursor) } : undefined;
+
+    const outlets = await prisma.outlet.findMany({
+      take: takeNumber,
+      skip: cursorObject ? 1 : 0,
+      cursor: cursorObject,
+      where: {
+        ownerId,
+      },
+    });
+
+    const nextCursor =
+      outlets.length === takeNumber ? outlets[outlets.length - 1].id : null;
+
+    res.status(200).json({ status: "success", data: { outlets, nextCursor } });
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") console.error(error);
     res
       .status(500)
       .json({ status: "error", message: ["Internal server error"] });
