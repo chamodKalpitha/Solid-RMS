@@ -331,6 +331,21 @@ export default router;
  *                           type: string
  *                           format: date-time
  *                           example: "2024-08-03T17:03:17.431Z"
+ *       '400':
+ *         description: Bad request due to validation errors
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Email is already in use.", "BR Number is already in use."]
  *       '500':
  *         description: Internal server error
  *         content:
