@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { createMenu } from "../controller/menu.controller.mjs";
+import { createMenu, updateMenus } from "../controller/menu.controller.mjs";
 import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
 const router = Router();
 
 router.post("/new", checkRole("OWNER"), createMenu);
+router.patch("/edit/:id",checkRole(["OWNER"]),updateMenus);
 
 export default router;
 
@@ -80,6 +81,125 @@ export default router;
  *                   items:
  *                     type: string
  *                   example: ["There are duplicate dishes", "Some dish IDs are invalid" , "Dish already exists"]
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Internal server error"]
+ */
+
+/**
+ * @swagger
+ * /api/v1/menu/edit/{id}:
+ *   patch:
+ *     tags:
+ *       - Menu
+ *     summary: Update an existing menu
+ *     description: Updates the details of an existing menu, including its name and associated dishes.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: The ID of the menu to update.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: "menu Ravindu"
+ *               dishIds:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *                 example: [2, 3, 4]
+ *             required:
+ *               - name
+ *               - dishIds
+ *     responses:
+ *       '200':
+ *         description: Successfully updated the menu
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "success"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 6
+ *                     name:
+ *                       type: string
+ *                       example: "menu Ravindu"
+ *                     ownerId:
+ *                       type: integer
+ *                       example: 2
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-11T00:10:14.796Z"
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-11T14:19:13.284Z"
+ *                     menuDishes:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                             example: 13
+ *                           menuId:
+ *                             type: integer
+ *                             example: 6
+ *                           dishId:
+ *                             type: integer
+ *                             example: 2
+ *                           createdAt:
+ *                             type: string
+ *                             format: date-time
+ *                             example: "2024-08-11T14:19:13.284Z"
+ *                           updatedAt:
+ *                             type: string
+ *                             format: date-time
+ *                             example: "2024-08-11T14:19:13.284Z"
+ *       '404':
+ *         description: Menu not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Menu not found"]
  *       '500':
  *         description: Internal server error
  *         content:

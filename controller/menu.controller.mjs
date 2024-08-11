@@ -1,5 +1,5 @@
 import prisma from "../prisma/prismaClient.mjs";
-import menuSchema from "../validation/menu.validation.mjs";
+import menuSchema, { menuIdSchema, updateMenuSchema } from "../validation/menu.validation.mjs";
 import "dotenv/config";
 
 export async function createMenu(req, res) {
@@ -66,5 +66,58 @@ export async function createMenu(req, res) {
     res
       .status(500)
       .json({ status: "error", message: ["Internal server error"] });
+  }
+}
+
+//Update Menu
+export async function updateMenus (req,res){
+  const {error:idError, value:idValue} = menuIdSchema.validate(req.params);
+
+  const {id} = idValue;
+  const ownerId = req.user.ownerId;
+
+  if (idError) {
+    const errorMessages = idError.details.map((err) => err.message);
+    return res.status(400).json({ status: "error", message: errorMessages });
+  }
+
+  const {error:bodyError, value:bodyValue} = updateMenuSchema.validate(req.body);
+
+  const { name,dishIds } = bodyValue;
+
+  if (bodyError) {
+    const errorRespond = bodyError.details.map((err) => err.message);
+    return res.status(400).json({ status: "error", message: errorRespond });
+  }
+
+  try {
+    const updatedMenu = await prisma.menu.update({
+      where: {
+        id, 
+        ownerId  
+      },
+      data: {
+        name,
+        menuDishes: dishIds
+          ? {
+              deleteMany: {}, 
+              create: dishIds.map((dishId) => ({
+                dish: { connect: { id: dishId } }, 
+              })),
+            }
+          : undefined,
+      },
+      include: {
+        menuDishes: true, 
+      },
+    });
+
+    return res.status(200).json({ status: "success", data: updatedMenu });
+  } catch (error) {
+    if (error.code === "P2025") {
+      return res.status(404).json({ status: "error", message: ["Menu not found"] });
+    }
+    if (process.env.NODE_ENV === "development") console.error(error);
+    return res.status(500).json({ status: "error", message: ["Internal server error"] });
   }
 }
