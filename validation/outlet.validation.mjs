@@ -20,26 +20,3 @@ export const getAllOutletSchema = Joi.object({
 }).options({
   abortEarly: false,
 });
-
-export const updateOutletSchema = Joi.object({
-  location: Joi.string().optional().messages({
-    "string.base": "Location should be a type of text",
-    "string.empty": "Location cannot be an empty field",
-    "any.required": "Location is a required field",
-  }),
-  menuId: Joi.number().integer().positive().optional().messages({
-    "number.base": "Menu ID must be a number",
-    "number.integer": "Menu ID must be an integer",
-    "number.positive": "Menu ID must be a positive number",
-    "any.required": "Menu ID is required",
-  }),
-});
-
-export const idSchema = Joi.object({
-  outletId: Joi.number().integer().positive().required().messages({
-    "number.base": "ID must be a number",
-    "number.integer": "ID must be an integer",
-    "number.positive": "ID must be a positive number",
-    "any.required": "ID is required",
-  }),
-});
