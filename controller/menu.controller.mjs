@@ -1,5 +1,5 @@
 import prisma from "../prisma/prismaClient.mjs";
-import menuSchema, { menuIdSchema, updateMenuSchema } from "../validation/menu.validation.mjs";
+import menuSchema, { getAllMenuSchema, menuIdSchema, updateMenuSchema } from "../validation/menu.validation.mjs";
 import "dotenv/config";
 
 export async function createMenu(req, res) {
@@ -119,5 +119,49 @@ export async function updateMenus (req,res){
     }
     if (process.env.NODE_ENV === "development") console.error(error);
     return res.status(500).json({ status: "error", message: ["Internal server error"] });
+  }
+}
+
+//get menu
+export async function getAllMenus(req, res) {
+  const ownerId = req.user.ownerId;
+
+  try {
+    const { error, value } = getAllMenuSchema.validate(req.query);
+
+    if (error) {
+      const errorRespond = error.details.map((err) => err.message);
+      return res.status(400).json({ status: "error", message: errorRespond });
+    }
+
+    const { cursor, take } = value;
+    const takeNumber = parseInt(take) || 10;
+    const cursorObject = cursor ? { id: parseInt(cursor) } : undefined;
+
+    const menus = await prisma.menu.findMany({
+      take: takeNumber,
+      skip: cursorObject ? 1 : 0,
+      cursor: cursorObject,
+      where: {
+        ownerId,
+      },
+      include: {
+        menuDishes: true,
+      },
+    });
+
+    const nextCursor =
+      menus.length === takeNumber
+        ? menus[menus.length - 1].id
+        : null;
+
+    res
+      .status(200)
+      .json({ status: "success", data: { menus, nextCursor } });
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") console.error(error);
+    res
+      .status(500)
+      .json({ status: "error", message: ["Internal server error"] });
   }
 }
