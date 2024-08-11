@@ -20,3 +20,26 @@ export const getAllOutletSchema = Joi.object({
 }).options({
   abortEarly: false,
 });
+
+export const pacthOutletSchema = Joi.object({
+  location: Joi.string().optional().messages({
+    "string.base": "Location should be a type of text",
+    "string.empty": "Location cannot be an empty field",
+    "any.required": "Location is a required field",
+  }),
+  menuId: Joi.number().integer().optional().messages({
+    "array.base": "Menu IDs should be an array",
+    "number.base": "Menu ID should be a number",
+    "number.integer": "Menu ID should be an integer",
+    "any.required": "Menu IDs are required",
+  }),
+});
+
+export const idSchema = Joi.object({
+  outletId: Joi.number().integer().positive().required().messages({
+    "number.base": "ID must be a number",
+    "number.integer": "ID must be an integer",
+    "number.positive": "ID must be a positive number",
+    "any.required": "ID is required",
+  }),
+});
