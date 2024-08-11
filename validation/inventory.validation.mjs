@@ -33,3 +33,18 @@ export const outletIdSchema = Joi.object({
     "any.required": "ID is required",
   }),
 });
+
+export const updateInventoryBodySchema = Joi.object({
+  ingredientId: Joi.number().integer().required().messages({
+    "number.base": "Ingredient ID should be a number",
+    "number.integer": "Ingredient ID should be an integer",
+    "any.required": "Ingredient ID is a required field",
+  }),
+  quantity: Joi.number().positive().required().messages({
+    "number.base": "Quantity should be a number",
+    "number.positive": "Quantity should be a positive number",
+    "any.required": "Quantity is a required field",
+  }),
+}).options({
+  abortEarly: false,
+});

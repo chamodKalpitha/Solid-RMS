@@ -2,14 +2,19 @@ import { Router } from "express";
 import {
   addItemToInventory,
   getInventoryById,
+  updateInventoryItem,
 } from "../controller/inventory.controller.mjs";
 import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
 const router = Router();
 
-
 router.post("/add", checkRole("OWNER"), addItemToInventory);
 router.get("/getById/:outletId", checkRole("OWNER"), getInventoryById);
+router.patch(
+  "/updateInventory/:outletId",
+  checkRole("OWNER"),
+  updateInventoryItem
+);
 
 export default router;
 
@@ -230,6 +235,103 @@ export default router;
  *                   items:
  *                     type: string
  *                   example: ["Invalid Outlet Id"]
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Internal server error"]
+ */
+
+/**
+ * @swagger
+ * /api/v1/inventory/updateInventory/{outletId}:
+ *   patch:
+ *     tags:
+ *       - Inventory
+ *     summary: Update inventory item quantity
+ *     description: Updates the quantity of an ingredient in the inventory for a specific outlet owned by the authenticated owner.
+ *     parameters:
+ *       - in: path
+ *         name: outletId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID of the outlet
+ *         example: 1
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               ingredientId:
+ *                 type: integer
+ *                 description: ID of the ingredient to update
+ *                 example: 1
+ *               quantity:
+ *                 type: integer
+ *                 description: New quantity of the ingredient
+ *                 example: 20
+ *     responses:
+ *       '200':
+ *         description: Successfully updated the inventory item
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "success"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     inventoryId:
+ *                       type: integer
+ *                       example: 1
+ *                     ingredientId:
+ *                       type: integer
+ *                       example: 1
+ *                     quantity:
+ *                       type: integer
+ *                       example: 20
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-10T16:50:59.853Z"
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-11T11:23:31.388Z"
+ *       '400':
+ *         description: Invalid Outlet ID or Ingredient not found in inventory
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Invalid Outlet ID", "Inventory not found"]
  *       '500':
  *         description: Internal server error
  *         content:

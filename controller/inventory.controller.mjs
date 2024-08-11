@@ -2,6 +2,7 @@ import prisma from "../prisma/prismaClient.mjs";
 import {
   addItemSchema,
   outletIdSchema,
+  updateInventoryBodySchema,
 } from "../validation/inventory.validation.mjs";
 import "dotenv/config";
 
@@ -126,6 +127,88 @@ export async function getInventoryById(req, res) {
         .json({ status: "error", message: ["Invalid Outlet Id"] });
     }
     res.status(200).json({ status: "success", data: outlet });
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") console.error(error);
+    res
+      .status(500)
+      .json({ status: "error", message: ["Internal server error"] });
+  }
+}
+
+export async function updateInventoryItem(req, res) {
+  const ownerId = req.user.ownerId;
+  const { error: paramsError, value: paramValue } = outletIdSchema.validate(
+    req.params
+  );
+  const { error: bodyError, value } = updateInventoryBodySchema.validate(
+    req.body
+  );
+  const { outletId } = paramValue;
+  const { ingredientId, quantity } = value;
+  let errors = [];
+
+  if (paramsError) {
+    const errorRespond = paramsError.details.map((err) => err.message);
+    return res.status(400).json({ status: "error", message: errorRespond });
+  }
+
+  if (bodyError) {
+    const errorRespond = bodyError.details.map((err) => err.message);
+    return res.status(400).json({ status: "error", message: errorRespond });
+  }
+
+  try {
+    const existingOutlet = await prisma.outlet.findUnique({
+      where: { id: outletId },
+    });
+
+    if (!existingOutlet || existingOutlet.ownerId !== ownerId) {
+      return res
+        .status(400)
+        .json({ status: "error", message: ["Invalid Outlet ID"] });
+    }
+
+    const inventory = await prisma.inventory.findUnique({
+      where: { outletId },
+    });
+
+    if (!inventory) {
+      return res.status(400).json({
+        status: "error",
+        message: ["Inventory not found"],
+      });
+    }
+
+    const inventoryIngredient = await prisma.inventoryIngredient.findUnique({
+      where: {
+        inventoryId_ingredientId: {
+          inventoryId: inventory.id,
+          ingredientId: ingredientId,
+        },
+      },
+    });
+
+    if (!inventoryIngredient) {
+      return res.status(400).json({
+        status: "error",
+        message: ["Ingredient not found in inventory"],
+      });
+    }
+
+    // Update the quantity
+    const updatedInventoryIngredient = await prisma.inventoryIngredient.update({
+      where: {
+        id: inventoryIngredient.id,
+      },
+      data: {
+        quantity: quantity,
+      },
+    });
+
+    return res.status(200).json({
+      status: "success",
+      data: updatedInventoryIngredient,
+    });
   } catch (error) {
     if (process.env.NODE_ENV === "development") console.error(error);
     res
