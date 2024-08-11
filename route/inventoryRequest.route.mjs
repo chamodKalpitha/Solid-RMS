@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   addInventoryRequest,
   getAllInventoryRequest,
+  updateInventoryRequestStatus,
 } from "../controller/inventoryRequest.controller.mjs";
 import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
@@ -9,6 +10,11 @@ const router = Router();
 
 router.post("/add", checkRole(["OWNER", "MANAGER"]), addInventoryRequest);
 router.get("/all", checkRole(["OWNER", "MANAGER"]), getAllInventoryRequest);
+router.patch(
+  "/updateStatus/:id",
+  checkRole(["OWNER"]),
+  updateInventoryRequestStatus
+);
 
 export default router;
 
@@ -242,6 +248,99 @@ export default router;
  *                     nextCursor:
  *                       type: integer
  *                       example: null
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Internal server error"]
+ */
+
+/**
+ * @swagger
+ * /api/v1/inventoryRequest/updateStatus/{inventoryRequestId}:
+ *   patch:
+ *     tags:
+ *       - Inventory Request
+ *     summary: Update inventory request status
+ *     description: Updates the status of an inventory request for a specific owner.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID of the inventory request
+ *         example: 1
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 description: New status of the inventory request
+ *                 example: "APPROVED"
+ *     responses:
+ *       '200':
+ *         description: Successfully updated the inventory request status
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "success"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     ownerId:
+ *                       type: integer
+ *                       example: 1
+ *                     managerId:
+ *                       type: integer
+ *                       example: 1
+ *                     status:
+ *                       type: string
+ *                       example: "APPROVED"
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-10T17:59:07.262Z"
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-11T11:59:06.568Z"
+ *       '404':
+ *         description: Inventory request not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Inventory request not found"]
  *       '500':
  *         description: Internal server error
  *         content:
