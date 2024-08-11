@@ -2,6 +2,8 @@ import prisma from "../prisma/prismaClient.mjs";
 import {
   createInventoryRequestSchema,
   getAllInventoryRequestSchema,
+  updateInventoryRequestSchema,
+  requestIdSchema,
 } from "../validation/inventoryRequest.validation.mjs";
 import "dotenv/config";
 
@@ -117,6 +119,56 @@ export async function getAllInventoryRequest(req, res) {
     res
       .status(200)
       .json({ status: "success", data: { inventoryRequest, nextCursor } });
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") console.error(error);
+    res
+      .status(500)
+      .json({ status: "error", message: ["Internal server error"] });
+  }
+}
+
+export async function updateInventoryRequestStatus(req, res) {
+  const ownerId = req.user.ownerId;
+  const { error: paramsError, value: paramValue } = requestIdSchema.validate(
+    req.params
+  );
+  const { error: bodyError, value } = updateInventoryRequestSchema.validate(
+    req.body
+  );
+  const { id } = paramValue;
+  const { status } = value;
+
+  if (paramsError) {
+    const errorRespond = paramsError.details.map((err) => err.message);
+    return res.status(400).json({ status: "error", message: errorRespond });
+  }
+
+  if (bodyError) {
+    const errorRespond = bodyError.details.map((err) => err.message);
+    return res.status(400).json({ status: "error", message: errorRespond });
+  }
+
+  try {
+    // Check if the inventory request exists
+    const existingRequest = await prisma.inventoryRequest.findUnique({
+      where: { id, ownerId },
+    });
+
+    if (!existingRequest) {
+      return res
+        .status(404)
+        .json({ status: "error", message: ["Inventory request not found"] });
+    }
+
+    const updatedRequest = await prisma.inventoryRequest.update({
+      where: { id },
+      data: { status },
+    });
+
+    return res.status(200).json({
+      status: "success",
+      data: updatedRequest,
+    });
   } catch (error) {
     if (process.env.NODE_ENV === "development") console.error(error);
     res

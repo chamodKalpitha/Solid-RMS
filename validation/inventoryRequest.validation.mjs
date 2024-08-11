@@ -31,3 +31,23 @@ export const getAllInventoryRequestSchema = Joi.object({
 }).options({
   abortEarly: false,
 });
+
+export const updateInventoryRequestSchema = Joi.object({
+  status: Joi.string().valid("APPROVED", "REJECTED").required().messages({
+    "string.empty": "Status is required.",
+    "any.only": "Status must be either PENDING, APPROVED, or REJECTED.",
+    "any.required": "Status is a required field.",
+  }),
+}).options({
+  abortEarly: false,
+});
+
+export const requestIdSchema = Joi.object({
+  id: Joi.number().integer().required().messages({
+    "number.base": "Request ID should be a number",
+    "number.integer": "Request ID should be an integer",
+    "any.required": "Request ID is a required field",
+  }),
+}).options({
+  abortEarly: false,
+});
