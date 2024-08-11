@@ -165,3 +165,31 @@ export async function getAllMenus(req, res) {
       .json({ status: "error", message: ["Internal server error"] });
   }
 }
+
+//delete menu
+export  async function deleteMenu(req,res){
+  const { error: idError, value: idValue } = menuIdSchema.validate(req.params);
+  const { id } = idValue;
+  const ownerId = req.user.ownerId;
+
+  if (idError) {
+    const errorMessages = idError.details.map((err) => err.message);
+    return res.status(400).json({ status: "error", message: errorMessages });
+  }
+  try {
+    const deleteMenu = await prisma.menu.delete({
+      where: {
+        id,
+        ownerId,
+      }
+    });
+
+    return res.status(200).json({ status: "success", data: deleteMenu });
+  } catch (error) {
+    if (error.code === "P2025") {
+      return res.status(404).json({ status: "error", message: ["Menu not found"] });
+    }
+    if (process.env.NODE_ENV === "development") console.error(error);
+    return res.status(500).json({ status: "error", message: ["Internal server error"] });
+  }
+}
