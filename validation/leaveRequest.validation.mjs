@@ -49,3 +49,33 @@ export const getAllLeaveRequestSchema = Joi.object({
 }).options({
   abortEarly: false,
 });
+
+export const leaveRequestIdSchema = Joi.object({
+  id: Joi.number().integer().required().messages({
+    "number.base": "ID should be a number",
+    "number.integer": "ID should be an integer",
+    "any.required": "ID is required",
+  }),
+});
+
+export const updateLeaveRequestBodySchema = Joi.object({
+  type: Joi.string().valid("SICK", "CASUAL", "ANNUAL").optional().messages({
+    "any.only": "Type must be one of 'SICK', 'CASUAL', or 'ANNUAL'",
+  }),
+  from: Joi.date().optional().messages({
+    "date.base": "From date should be a valid date",
+  }),
+  noOfDate: Joi.number().integer().optional().messages({
+    "number.base": "Number of days should be a number",
+    "number.integer": "Number of days should be an integer",
+  }),
+  reason: Joi.string().optional().messages({
+    "string.base": "Reason should be a string",
+  }),
+  employeeId: Joi.number().integer().optional().messages({
+    "number.base": "Employee ID should be a number",
+    "number.integer": "Employee ID should be an integer",
+  }),
+}).options({
+  abortEarly: false,
+});

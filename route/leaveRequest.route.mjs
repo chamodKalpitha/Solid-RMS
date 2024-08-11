@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   addLeaveRequest,
   getAllLeaveRequest,
+  updateLeaveRequest,
 } from "../controller/leaveRequest.controller.mjs";
 import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
@@ -9,6 +10,7 @@ const router = Router();
 
 router.post("/add", checkRole(["OWNER"]), addLeaveRequest);
 router.get("/all", checkRole(["OWNER"]), getAllLeaveRequest);
+router.patch("/edit/:id", checkRole(["OWNER", "MANAGER"]), updateLeaveRequest);
 
 export default router;
 
@@ -294,6 +296,147 @@ export default router;
  *                     nextCursor:
  *                       type: integer
  *                       example: null
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Internal server error"]
+ */
+
+/**
+ * @swagger
+ * /api/v1/leaveRequest/edit/{leaveRequestId}:
+ *   patch:
+ *     tags:
+ *       - Leave Request
+ *     summary: Update leave request
+ *     description: Updates the details of a leave request for a specific owner, but only if the request status is "PENDING".
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID of the leave request
+ *         example: 1
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               type:
+ *                 type: string
+ *                 description: Type of leave request
+ *                 example: "SICK"
+ *               from:
+ *                 type: string
+ *                 format: date-time
+ *                 description: Start date of the leave
+ *                 example: "1970-01-01T00:00:00.000Z"
+ *               noOfDate:
+ *                 type: integer
+ *                 description: Number of leave days
+ *                 example: 11
+ *               employeeId:
+ *                 type: integer
+ *                 description: Employee Id
+ *                 example: 1
+ *               reason:
+ *                 type: string
+ *                 description: Reason for leave
+ *                 example: "Neck hurt"
+ *     responses:
+ *       '200':
+ *         description: Successfully updated the leave request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "success"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     type:
+ *                       type: string
+ *                       example: "SICK"
+ *                     from:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "1970-01-01T00:00:00.000Z"
+ *                     noOfDate:
+ *                       type: integer
+ *                       example: 11
+ *                     reason:
+ *                       type: string
+ *                       example: "Neck hurt"
+ *                     status:
+ *                       type: string
+ *                       example: "PENDING"
+ *                     employeeId:
+ *                       type: integer
+ *                       example: 1
+ *                     managerId:
+ *                       type: integer
+ *                       example: 1
+ *                     ownerId:
+ *                       type: integer
+ *                       example: 1
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-10T18:04:03.899Z"
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-11T13:28:01.138Z"
+ *       '400':
+ *         description: Validation error or request cannot be updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Cannot update leave request because decision already taken"]
+ *       '404':
+ *         description: Leave request not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Leave request not found"]
  *       '500':
  *         description: Internal server error
  *         content:
