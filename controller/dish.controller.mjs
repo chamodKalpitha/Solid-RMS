@@ -1,5 +1,5 @@
 import prisma from "../prisma/prismaClient.mjs";
-import dishSchema from "../validation/dish.validation.mjs";
+import dishSchema, { dishIdSchema, dishIngredientsSchema, dishUpdateSchema } from "../validation/dish.validation.mjs";
 import "dotenv/config";
 
 export async function createDish(req, res) {
@@ -98,3 +98,95 @@ export async function getAllDishes(req, res) {
       .json({ status: "error", message: ["Internal server error"] });
   }
 }
+
+//update Dishes
+export async function updateDishes (req,res){
+  const {error:idError, value:idValue} = dishIdSchema.validate(req.params);
+
+  const {id} = idValue;
+  const ownerId = req.user.ownerId;
+
+  if (idError) {
+    const errorMessages = idError.details.map((err) => err.message);
+    return res.status(400).json({ status: "error", message: errorMessages });
+  }
+
+  const { error: bodyError, value: bodyValue } =dishUpdateSchema.validate(req.body);
+  
+  if (bodyError) {
+    const errorRespond = bodyError.details.map((err) => err.message);
+    return res.status(400).json({ status: "error", message: errorRespond });
+  }
+
+  try {
+    const updatedDish = await prisma.dish.update({
+      where: { 
+        ownerId,
+        id
+      },
+      data: bodyValue,
+    });
+
+    return res.status(200).json({ status: 'success', data: updatedDish });
+  } catch (error) {
+
+    if (error.code === "P2025") {
+      return res
+        .status(404)
+        .json({ status: "error", message: ["Dish not found"] });
+    }
+    if (process.env.NODE_ENV === 'development') console.error(error);
+    return res.status(500).json({ status: 'error', message: 'Internal server error' });
+  }
+}
+
+//update dishIngredeint
+
+export async function updateDishIngredients(req, res){
+  const {error:idError, value:idValue} = dishIdSchema.validate(req.params);
+
+  const {id} = idValue;
+  const ownerId = req.user.ownerId;
+
+  if (idError) {
+    const errorMessages = idError.details.map((err) => err.message);
+    return res.status(400).json({ status: "error", message: errorMessages });
+  }
+
+  const {error:bodyError, value:bodyValue} = dishIngredientsSchema.validate(req.body);
+
+  const { ingredients } = bodyValue;
+  if (bodyError) {
+    const errorRespond = bodyError.details.map((err) => err.message);
+    return res.status(400).json({ status: "error", message: errorRespond });
+  }
+
+  try {
+    const updatedDishIngredient = await prisma.dish.update({
+      where:{
+        ownerId,
+        id},
+      data: {
+        dishIngredients: {
+          deleteMany: {}, 
+          create: ingredients.map(ingredient => ({
+            ingredient: { connect: { id: ingredient.id } },
+            quantity: ingredient.quantity,
+          })),
+        },
+      },
+      include: { dishIngredients: true },
+    });
+    return res.status(200).json({ status: "success", data: updatedDishIngredient });
+  } catch (error) {
+
+    if (error.code === "P2025") {
+      return res
+        .status(404)
+        .json({ status: "error", message: ["Ingredient Not Found"] });
+    }
+    if (process.env.NODE_ENV === 'development') console.error(error);
+    return res.status(500).json({ status: 'error', message: 'Internal server error' });
+  }
+}
+

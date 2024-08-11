@@ -1,11 +1,14 @@
 import { Router } from "express";
-import { createDish, getAllDishes } from "../controller/dish.controller.mjs";
+import { createDish, getAllDishes, updateDishes, updateDishIngredients } from "../controller/dish.controller.mjs";
 import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
 const router = Router();
 
 router.post("/new", checkRole("OWNER"), createDish);
 router.get("/all", getAllDishes);
+router.patch("/dishEdit/:id", checkRole("OWNER"), updateDishes);
+router.patch("/dishIngredientEdit/:id",checkRole("OWNER"), updateDishIngredients);
+
 
 export default router;
 
@@ -184,4 +187,203 @@ export default router;
  *                   items:
  *                     type: string
  *                   example: ["Internal server error"]
+ */
+
+
+/**
+ * @swagger
+ * /api/v1/dish/dishEdit/{id}:
+ *   patch:
+ *     tags:
+ *       - Dish
+ *     summary: Update an existing dish
+ *     description: Updates the details of an existing dish associated with the authenticated owner.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The ID of the dish to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: "Pizza"
+ *               price:
+ *                 type: number
+ *                 example: 15.99
+ *               url:
+ *                 type: string
+ *                 example: "http://example.com/updated-dish"
+ *               estimatedCount:
+ *                 type: number
+ *                 example: 20
+ *     responses:
+ *       '200':
+ *         description: Successfully updated the dish
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "success"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     name:
+ *                       type: string
+ *                       example: "Pizza"
+ *                     price:
+ *                       type: number
+ *                       example: 15.99
+ *                     url:
+ *                       type: string
+ *                       example: "http://example.com/updated-dish"
+ *                     estimatedCount:
+ *                       type: number
+ *                       example: 20
+ *                     ownerId:
+ *                       type: integer
+ *                       example: 1
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-03T17:03:17.431Z"
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-03T17:03:17.431Z"
+ *       '404':
+ *         description: Dish not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: string
+ *                   example: "Dish not found"
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+
+
+/**
+ * @swagger
+ * /api/v1/dish/dishIngredientEdit/{id}:
+ *   patch:
+ *     tags:
+ *       - Dish
+ *     summary: Update dish ingredients
+ *     description: Updates the ingredients of an existing dish associated with the authenticated owner.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The ID of the dish whose ingredients are to be updated
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               ingredients:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     quantity:
+ *                       type: number
+ *                       example: 3
+ *     responses:
+ *       '200':
+ *         description: Successfully updated dish ingredients
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "success"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     name:
+ *                       type: string
+ *                       example: "Pizza"
+ *                     price:
+ *                       type: number
+ *                       example: 15.99
+ *                     dishIngredients:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                             example: 1
+ *                           quantity:
+ *                             type: number
+ *                             example: 3
+ *       '404':
+ *         description: Ingredient not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: string
+ *                   example: "Ingredient not found"
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
  */
