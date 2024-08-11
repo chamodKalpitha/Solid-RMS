@@ -1,11 +1,12 @@
 import { Router } from "express";
-import { createMenu, updateMenus } from "../controller/menu.controller.mjs";
+import { createMenu, getAllMenus, updateMenus } from "../controller/menu.controller.mjs";
 import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
 const router = Router();
 
 router.post("/new", checkRole("OWNER"), createMenu);
 router.patch("/edit/:id",checkRole(["OWNER"]),updateMenus);
+router.get("/all",checkRole(["OWNER"]),getAllMenus);
 
 export default router;
 
@@ -200,6 +201,105 @@ export default router;
  *                   items:
  *                     type: string
  *                   example: ["Menu not found"]
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Internal server error"]
+ */
+
+/**
+ * @swagger
+ * /api/v1/menu/all:
+ *   get:
+ *     tags:
+ *       - Menu
+ *     summary: Retrieve all menus
+ *     description: Retrieves a list of menus for the authenticated owner with pagination support.
+ *     parameters:
+ *       - name: cursor
+ *         in: query
+ *         schema:
+ *           type: integer
+ *           example: 10
+ *         description: The ID of the last menu from the previous page (for pagination).
+ *       - name: take
+ *         in: query
+ *         schema:
+ *           type: integer
+ *           example: 10
+ *         description: The number of menus to retrieve per page.
+ *     responses:
+ *       '200':
+ *         description: Successfully retrieved the list of menus
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "success"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     menus:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                             example: 6
+ *                           name:
+ *                             type: string
+ *                             example: "menu Ravindu"
+ *                           ownerId:
+ *                             type: integer
+ *                             example: 2
+ *                           createdAt:
+ *                             type: string
+ *                             format: date-time
+ *                             example: "2024-08-11T00:10:14.796Z"
+ *                           updatedAt:
+ *                             type: string
+ *                             format: date-time
+ *                             example: "2024-08-11T14:19:13.284Z"
+ *                           menuDishes:
+ *                             type: array
+ *                             items:
+ *                               type: object
+ *                               properties:
+ *                                 id:
+ *                                   type: integer
+ *                                   example: 13
+ *                                 menuId:
+ *                                   type: integer
+ *                                   example: 6
+ *                                 dishId:
+ *                                   type: integer
+ *                                   example: 2
+ *                                 createdAt:
+ *                                   type: string
+ *                                   format: date-time
+ *                                   example: "2024-08-11T14:19:13.284Z"
+ *                                 updatedAt:
+ *                                   type: string
+ *                                   format: date-time
+ *                                   example: "2024-08-11T14:19:13.284Z"
+ *                     nextCursor:
+ *                       type: integer
+ *                       example: 7
  *       '500':
  *         description: Internal server error
  *         content:
