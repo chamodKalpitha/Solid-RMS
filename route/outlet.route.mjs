@@ -2,7 +2,6 @@ import { Router } from "express";
 import {
   createOutlet,
   getAllOutlet,
-  updateOutlet,
 } from "../controller/outlet.controller.mjs";
 import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
@@ -10,7 +9,6 @@ const router = Router();
 
 router.post("/new", checkRole(["OWNER"]), createOutlet);
 router.get("/all", checkRole(["OWNER"]), getAllOutlet);
-router.patch("/edit/:outletId", checkRole(["OWNER"]), updateOutlet);
 
 export default router;
 
@@ -178,116 +176,4 @@ export default router;
  *                     type: string
  *                   example:
  *                     - "Internal server error"
- */
-
-/**
- * @swagger
- * /api/v1/outlet/edit/{id}:
- *   patch:
- *     tags:
- *       - Outlet
- *     summary: Update an outlet
- *     description: Updates the details of an outlet associated with the authenticated owner.
- *     parameters:
- *       - in: path
- *         name: outletId
- *         schema:
- *           type: integer
- *         required: true
- *         description: The ID of the outlet to update.
- *         example: 1
- *       - in: body
- *         name: body
- *         description: The new details for the outlet.
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             location:
- *               type: string
- *               example: "kaluthara"
- *             menuId:
- *               type: integer
- *               nullable: true
- *               example: null
- *     responses:
- *       '200':
- *         description: Successfully updated the outlet
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: "success"
- *                 data:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: integer
- *                       example: 1
- *                     location:
- *                       type: string
- *                       example: "kaluthara"
- *                     ownerId:
- *                       type: integer
- *                       example: 1
- *                     menuId:
- *                       type: integer
- *                       nullable: true
- *                       example: null
- *                     createdAt:
- *                       type: string
- *                       format: date-time
- *                       example: "2024-08-10T07:35:14.636Z"
- *                     updatedAt:
- *                       type: string
- *                       format: date-time
- *                       example: "2024-08-11T04:55:11.181Z"
- *       '400':
- *         description: Invalid request parameters
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: "error"
- *                 message:
- *                   type: array
- *                   items:
- *                     type: string
- *                     example: ["Invalid outlet ID", "Invalid request body"]
- *       '404':
- *         description: Outlet not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: "error"
- *                 message:
- *                   type: array
- *                   items:
- *                     type: string
- *                     example: ["Outlet not found"]
- *       '500':
- *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: "error"
- *                 message:
- *                   type: array
- *                   items:
- *                     type: string
- *                     example: ["Internal server error"]
  */
