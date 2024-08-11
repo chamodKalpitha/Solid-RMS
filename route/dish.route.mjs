@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createDish, getAllDishes, updateDishes, updateDishIngredients } from "../controller/dish.controller.mjs";
+import { createDish, deleteDishes, getAllDishes, updateDishes, updateDishIngredients } from "../controller/dish.controller.mjs";
 import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
 const router = Router();
@@ -8,6 +8,7 @@ router.post("/new", checkRole("OWNER"), createDish);
 router.get("/all", getAllDishes);
 router.patch("/dishEdit/:id", checkRole("OWNER"), updateDishes);
 router.patch("/dishIngredientEdit/:id",checkRole("OWNER"), updateDishIngredients);
+router.delete("/delete/:id",checkRole("OWNER"),deleteDishes);
 
 
 export default router;
@@ -386,4 +387,91 @@ export default router;
  *                 message:
  *                   type: string
  *                   example: "Internal server error"
+ */
+
+/**
+ * @swagger
+ * /api/v1/dish/delete/{id}:
+ *   delete:
+ *     tags:
+ *       - Dish
+ *     summary: Delete a dish
+ *     description: Deletes a dish specified by its ID. The dish must be owned by the authenticated owner.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the dish to be deleted.
+ *     responses:
+ *       '200':
+ *         description: Successfully deleted the dish
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "success"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     name:
+ *                       type: string
+ *                       example: "Pasta Primavera"
+ *                     price:
+ *                       type: number
+ *                       example: 12.99
+ *                     url:
+ *                       type: string
+ *                       example: "http://example.com/pasta-primavera"
+ *                     estimatedCount:
+ *                       type: number
+ *                       example: 10
+ *                     ownerId:
+ *                       type: integer
+ *                       example: 1
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-03T17:03:17.431Z"
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-03T17:03:17.431Z"
+ *       '404':
+ *         description: Dish not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Dish not found"]
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Internal server error"]
  */
