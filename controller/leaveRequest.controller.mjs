@@ -2,6 +2,8 @@ import prisma from "../prisma/prismaClient.mjs";
 import {
   createLeaveRequestSchema,
   getAllLeaveRequestSchema,
+  updateLeaveRequestBodySchema,
+  leaveRequestIdSchema,
 } from "../validation/leaveRequest.validation.mjs";
 import "dotenv/config";
 
@@ -104,6 +106,65 @@ export async function getAllLeaveRequest(req, res) {
     res
       .status(200)
       .json({ status: "success", data: { leaveRequest, nextCursor } });
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") console.error(error);
+    res
+      .status(500)
+      .json({ status: "error", message: ["Internal server error"] });
+  }
+}
+
+export async function updateLeaveRequest(req, res) {
+  const ownerId = req.user.ownerId;
+
+  const { error: paramsError, value: paramValue } =
+    leaveRequestIdSchema.validate(req.params);
+
+  const { error: bodyError, value } = updateLeaveRequestBodySchema.validate(
+    req.body
+  );
+
+  if (paramsError) {
+    const errorRespond = paramsError.details.map((err) => err.message);
+    return res.status(400).json({ status: "error", message: errorRespond });
+  }
+
+  if (bodyError) {
+    const errorRespond = bodyError.details.map((err) => err.message);
+    return res.status(400).json({ status: "error", message: errorRespond });
+  }
+
+  const { id } = paramValue;
+
+  try {
+    const leaveRequest = await prisma.leaveRequest.findUnique({
+      where: { id, ownerId },
+    });
+
+    if (!leaveRequest) {
+      return res.status(404).json({
+        status: "error",
+        message: ["Leave request not found"],
+      });
+    }
+
+    if (leaveRequest.status !== "PENDING") {
+      return res.status(400).json({
+        status: "error",
+        message: ["Cannot update leave request beacuse decision already taken"],
+      });
+    }
+
+    // Update the leave request
+    const updatedLeaveRequest = await prisma.leaveRequest.update({
+      where: { id },
+      data: value,
+    });
+
+    return res.status(200).json({
+      status: "success",
+      data: updatedLeaveRequest,
+    });
   } catch (error) {
     if (process.env.NODE_ENV === "development") console.error(error);
     res
