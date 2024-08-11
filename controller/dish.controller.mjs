@@ -190,3 +190,31 @@ export async function updateDishIngredients(req, res){
   }
 }
 
+//Delete Dishes
+export  async function deleteDishes(req,res){
+  const { error: idError, value: idValue } = dishIdSchema.validate(req.params);
+  const { id } = idValue;
+  const ownerId = req.user.ownerId;
+
+  if (idError) {
+    const errorMessages = idError.details.map((err) => err.message);
+    return res.status(400).json({ status: "error", message: errorMessages });
+  }
+
+  try {
+    const deletedDish = await prisma.dish.delete({
+      where: {
+        id,
+        ownerId,
+      }
+    });
+
+    return res.status(200).json({ status: "success", data: deletedDish });
+  } catch (error) {
+    if (error.code === "P2025") {
+      return res.status(404).json({ status: "error", message: ["Dish not found"] });
+    }
+    if (process.env.NODE_ENV === "development") console.error(error);
+    return res.status(500).json({ status: "error", message: ["Internal server error"] });
+  }
+}
