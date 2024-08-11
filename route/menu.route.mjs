@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createMenu, getAllMenus, updateMenus } from "../controller/menu.controller.mjs";
+import { createMenu, deleteMenu, getAllMenus, updateMenus } from "../controller/menu.controller.mjs";
 import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
 const router = Router();
@@ -7,6 +7,7 @@ const router = Router();
 router.post("/new", checkRole("OWNER"), createMenu);
 router.patch("/edit/:id",checkRole(["OWNER"]),updateMenus);
 router.get("/all",checkRole(["OWNER"]),getAllMenus);
+router.delete("/delete/:id",checkRole(["OWNER"]),deleteMenu);
 
 export default router;
 
@@ -300,6 +301,85 @@ export default router;
  *                     nextCursor:
  *                       type: integer
  *                       example: 7
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Internal server error"]
+ */
+
+/**
+ * @swagger
+ * /api/v1/menu/delete/{id}:
+ *   delete:
+ *     tags:
+ *       - Menu
+ *     summary: Delete a menu
+ *     description: Deletes a menu by its ID for the authenticated owner.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: ID of the menu to delete
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     responses:
+ *       '200':
+ *         description: Successfully deleted the menu
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "success"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     name:
+ *                       type: string
+ *                       example: "Menu Ravindu"
+ *                     ownerId:
+ *                       type: integer
+ *                       example: 1
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-06T17:03:17.431Z"
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-06T17:03:17.431Z"
+ *       '404':
+ *         description: Menu not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Menu not found"]
  *       '500':
  *         description: Internal server error
  *         content:
