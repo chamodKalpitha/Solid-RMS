@@ -3,6 +3,7 @@ import {
   addLeaveRequest,
   getAllLeaveRequest,
   updateLeaveRequest,
+  deleteLeaveRequest,
 } from "../controller/leaveRequest.controller.mjs";
 import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
@@ -11,6 +12,11 @@ const router = Router();
 router.post("/add", checkRole(["OWNER"]), addLeaveRequest);
 router.get("/all", checkRole(["OWNER"]), getAllLeaveRequest);
 router.patch("/edit/:id", checkRole(["OWNER", "MANAGER"]), updateLeaveRequest);
+router.delete(
+  "/delete/:id",
+  checkRole(["OWNER", "MANAGER"]),
+  deleteLeaveRequest
+);
 
 export default router;
 
@@ -422,6 +428,119 @@ export default router;
  *                   items:
  *                     type: string
  *                   example: ["Cannot update leave request because decision already taken"]
+ *       '404':
+ *         description: Leave request not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Leave request not found"]
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Internal server error"]
+ */
+
+/**
+ * @swagger
+ * /api/v1/leaveRequest/delete/{id}:
+ *   delete:
+ *     tags:
+ *       - Leave Request
+ *     summary: Delete a leave request
+ *     description: Deletes a leave request by its ID if the requester is authorized.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID of the leave request to delete
+ *         example: 1
+ *     responses:
+ *       '200':
+ *         description: Successfully deleted the leave request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "success"
+ *                 message:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     type:
+ *                       type: string
+ *                       example: "SICK"
+ *                     from:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "1970-01-01T00:00:00.000Z"
+ *                     noOfDate:
+ *                       type: integer
+ *                       example: 11
+ *                     reason:
+ *                       type: string
+ *                       example: "Neck hert"
+ *                     status:
+ *                       type: string
+ *                       example: "PENDING"
+ *                     employeeId:
+ *                       type: integer
+ *                       example: 1
+ *                     managerId:
+ *                       type: integer
+ *                       example: 1
+ *                     ownerId:
+ *                       type: integer
+ *                       example: 1
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-10T18:04:03.899Z"
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-11T13:28:01.138Z"
+ *       '403':
+ *         description: Unauthorized to delete the leave request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Not authorized to delete this leave request"]
  *       '404':
  *         description: Leave request not found
  *         content:

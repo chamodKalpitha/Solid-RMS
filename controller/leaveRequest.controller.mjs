@@ -172,3 +172,52 @@ export async function updateLeaveRequest(req, res) {
       .json({ status: "error", message: ["Internal server error"] });
   }
 }
+
+export async function deleteLeaveRequest(req, res) {
+  const ownerId = req.user.ownerId;
+  const managerId = req.user.managerId;
+  const { error, value } = leaveRequestIdSchema.validate(req.params);
+  let errors = [];
+
+  if (error) {
+    const errorRespond = bodyError.details.map((err) => err.message);
+    return res.status(400).json({ status: "error", message: errorRespond });
+  }
+  const { id } = value;
+  try {
+    const leaveRequest = await prisma.leaveRequest.findUnique({
+      where: { id },
+    });
+
+    if (!leaveRequest) {
+      return res.status(404).json({
+        status: "error",
+        message: ["Leave request not found"],
+      });
+    }
+
+    if (
+      leaveRequest.ownerId !== ownerId &&
+      leaveRequest.managerId !== managerId
+    ) {
+      return res.status(403).json({
+        status: "error",
+        message: ["Not authorized to delete this leave request"],
+      });
+    }
+
+    const response = await prisma.leaveRequest.delete({
+      where: { id },
+    });
+
+    return res.status(200).json({
+      status: "success",
+      message: response,
+    });
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") console.error(error);
+    res
+      .status(500)
+      .json({ status: "error", message: ["Internal server error"] });
+  }
+}
