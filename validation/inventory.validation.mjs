@@ -48,3 +48,21 @@ export const updateInventoryBodySchema = Joi.object({
 }).options({
   abortEarly: false,
 });
+
+export const inventoryIdSchema = Joi.object({
+  inventoryId: Joi.number().integer().positive().required().messages({
+    "number.base": "ID must be a number",
+    "number.integer": "ID must be an integer",
+    "number.positive": "ID must be a positive number",
+    "any.required": "ID is required",
+  }),
+});
+
+export const removeItemSchema = Joi.object({
+  ingredientId: Joi.number().integer().positive().required().messages({
+    "number.base": "ID must be a number",
+    "number.integer": "ID must be an integer",
+    "number.positive": "ID must be a positive number",
+    "any.required": "ID is required",
+  }),
+});

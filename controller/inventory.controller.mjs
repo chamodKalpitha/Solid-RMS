@@ -3,6 +3,8 @@ import {
   addItemSchema,
   outletIdSchema,
   updateInventoryBodySchema,
+  inventoryIdSchema,
+  removeItemSchema,
 } from "../validation/inventory.validation.mjs";
 import "dotenv/config";
 
@@ -208,6 +210,82 @@ export async function updateInventoryItem(req, res) {
     return res.status(200).json({
       status: "success",
       data: updatedInventoryIngredient,
+    });
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") console.error(error);
+    res
+      .status(500)
+      .json({ status: "error", message: ["Internal server error"] });
+  }
+}
+
+export async function removeItemFromInventory(req, res) {
+  const ownerId = req.user.ownerId;
+  const { error: paramError, value: paramValue } = inventoryIdSchema.validate(
+    req.params
+  );
+  const { error, value } = removeItemSchema.validate(req.body);
+  const { ingredientId } = value;
+  const { inventoryId } = paramValue;
+  let errors = [];
+
+  if (error) {
+    const errorRespond = error.details.map((err) => err.message);
+    return res.status(400).json({ status: "error", message: errorRespond });
+  }
+
+  if (paramError) {
+    const errorRespond = paramError.details.map((err) => err.message);
+    return res.status(400).json({ status: "error", message: errorRespond });
+  }
+
+  try {
+    const existingInventory = await prisma.inventory.findUnique({
+      where: { id: inventoryId },
+      include: {
+        outlet: true,
+      },
+    });
+
+    if (!existingInventory) {
+      return res
+        .status(400)
+        .json({ status: "error", message: ["Invalid Inventory ID"] });
+    }
+
+    if (existingInventory.outlet.ownerId !== ownerId)
+      errors.push("Invalid Inventory ID");
+
+    // Check if the ingredient ID is valid and belongs to the inventory
+    const validIngredient = await prisma.inventoryIngredient.findUnique({
+      where: {
+        inventoryId_ingredientId: {
+          inventoryId: inventoryId,
+          ingredientId: ingredientId,
+        },
+      },
+    });
+
+    if (!validIngredient) {
+      errors.push("Invalid Ingredient ID or not found in the inventory");
+    }
+
+    if (errors.length > 0) {
+      return res.status(400).json({ status: "error", message: errors });
+    }
+
+    const response = await prisma.inventoryIngredient.delete({
+      where: {
+        inventoryId_ingredientId: {
+          inventoryId: inventoryId,
+          ingredientId: ingredientId,
+        },
+      },
+    });
+
+    return res.status(200).json({
+      status: "success",
+      data: response,
     });
   } catch (error) {
     if (process.env.NODE_ENV === "development") console.error(error);

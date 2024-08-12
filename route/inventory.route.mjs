@@ -3,6 +3,7 @@ import {
   addItemToInventory,
   getInventoryById,
   updateInventoryItem,
+  removeItemFromInventory,
 } from "../controller/inventory.controller.mjs";
 import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
@@ -14,6 +15,11 @@ router.patch(
   "/updateInventory/:outletId",
   checkRole("OWNER"),
   updateInventoryItem
+);
+router.delete(
+  "/deleteInventory/:inventoryId",
+  checkRole("OWNER"),
+  removeItemFromInventory
 );
 
 export default router;
@@ -332,6 +338,114 @@ export default router;
  *                   items:
  *                     type: string
  *                   example: ["Invalid Outlet ID", "Inventory not found"]
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Internal server error"]
+ */
+
+/**
+ * @swagger
+ * /api/v1/inventory/deleteInventory/{inventoryId}:
+ *   delete:
+ *     tags:
+ *       - Inventory
+ *     summary: Remove an item from inventory
+ *     description: Removes an ingredient from the specified inventory, if it exists and belongs to the owner.
+ *     parameters:
+ *       - in: path
+ *         name: inventoryId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID of the inventory
+ *         example: 1
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               ingredientId:
+ *                 type: integer
+ *                 description: ID of the ingredient to be removed from the inventory
+ *                 example: 1
+ *     responses:
+ *       '200':
+ *         description: Successfully removed the ingredient from the inventory
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "success"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     inventoryId:
+ *                       type: integer
+ *                       example: 1
+ *                     ingredientId:
+ *                       type: integer
+ *                       example: 1
+ *                     quantity:
+ *                       type: integer
+ *                       example: 20
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-10T16:50:59.853Z"
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-11T11:23:31.388Z"
+ *       '400':
+ *         description: Validation error or invalid inventory/ingredient ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Invalid Inventory ID", "Invalid Ingredient ID or not found in the inventory"]
+ *       '404':
+ *         description: Inventory not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Invalid Inventory ID"]
  *       '500':
  *         description: Internal server error
  *         content:
