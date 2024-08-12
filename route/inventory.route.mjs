@@ -431,21 +431,6 @@ export default router;
  *                   items:
  *                     type: string
  *                   example: ["Invalid Inventory ID", "Invalid Ingredient ID or not found in the inventory"]
- *       '404':
- *         description: Inventory not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: "error"
- *                 message:
- *                   type: array
- *                   items:
- *                     type: string
- *                   example: ["Invalid Inventory ID"]
  *       '500':
  *         description: Internal server error
  *         content:
