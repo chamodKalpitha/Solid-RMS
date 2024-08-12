@@ -1,11 +1,12 @@
 import { Router } from "express";
-import { createSupplier, updateSupplier } from "../controller/supplier.controller.mjs";
+import { createSupplier, getAllSupplier, updateSupplier } from "../controller/supplier.controller.mjs";
 import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
 const router = Router();
 
 router.post("/new", checkRole("OWNER"), createSupplier);
 router.patch("/edit/:id",checkRole(["OWNER"]),updateSupplier);
+router.get("/all",checkRole(["OWNER"]),getAllSupplier);
 
 export default router;
 
@@ -244,3 +245,116 @@ export default router;
  *                     - "Internal server error"
  */
 
+
+/**
+ * @swagger
+ * /api/v1/supplier/all:
+ *   get:
+ *     tags:
+ *       - Supplier
+ *     summary: Get all suppliers
+ *     description: Retrieves a list of suppliers along with their associated ingredients for a specific owner.
+ *     parameters:
+ *       - in: query
+ *         name: cursor
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: The cursor for pagination (the last supplier ID from the previous response).
+ *         example: "4"
+ *       - in: query
+ *         name: take
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         required: false
+ *         description: The number of suppliers to return.
+ *         example: 10
+ *     responses:
+ *       '200':
+ *         description: Successfully retrieved the suppliers
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "success"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     suppliers:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                             example: 1
+ *                           name:
+ *                             type: string
+ *                             example: "Supplier 1"
+ *                           email:
+ *                             type: string
+ *                             example: "supplier@example.com"
+ *                           address:
+ *                             type: string
+ *                             example: "1st Lane, Boralesgamuwa"
+ *                           contactNo:
+ *                             type: string
+ *                             example: "0714567890"
+ *                           ownerId:
+ *                             type: integer
+ *                             example: 2
+ *                           createdAt:
+ *                             type: string
+ *                             format: date-time
+ *                             example: "2024-08-12T22:34:48.406Z"
+ *                           updatedAt:
+ *                             type: string
+ *                             format: date-time
+ *                             example: "2024-08-12T23:31:27.827Z"
+ *                           supplierIngredients:
+ *                             type: array
+ *                             items:
+ *                               type: object
+ *                               properties:
+ *                                 id:
+ *                                   type: integer
+ *                                   example: 13
+ *                                 supplierId:
+ *                                   type: integer
+ *                                   example: 1
+ *                                 ingredientId:
+ *                                   type: integer
+ *                                   example: 3
+ *                                 createdAt:
+ *                                   type: string
+ *                                   format: date-time
+ *                                   example: "2024-08-12T23:31:27.827Z"
+ *                                 updatedAt:
+ *                                   type: string
+ *                                   format: date-time
+ *                                   example: "2024-08-12T23:31:27.827Z"
+ *                     nextCursor:
+ *                       type: integer
+ *                       example: 5
+ *                       nullable: true
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example:
+ *                     - "Internal server error"
+ */
