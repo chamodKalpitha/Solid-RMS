@@ -80,14 +80,13 @@ export const updateOwner = async (req, res) => {
   const { user, ...ownerData } = updateValue;
   const duplicateErrors = [];
 
-
   try {
     if (user) {
       if (user.email) {
         const existingUserEmail = await prisma.user.findFirst({
           where: {
             email: user.email,
-            id: { not: userId }, 
+            id: { not: userId },
           },
         });
         if (existingUserEmail) duplicateErrors.push("Email is already in use.");
@@ -98,28 +97,32 @@ export const updateOwner = async (req, res) => {
       const existingOwnerBrNo = await prisma.owner.findFirst({
         where: {
           brNo: ownerData.brNo,
-          id: { not: ownerId }, 
+          id: { not: ownerId },
         },
       });
-      if (existingOwnerBrNo) duplicateErrors.push("BR Number is already in use.");
+      if (existingOwnerBrNo)
+        duplicateErrors.push("BR Number is already in use.");
     }
 
     if (ownerData.contactNo) {
       const existingOwnerContactNo = await prisma.owner.findFirst({
         where: {
           contactNo: ownerData.contactNo,
-          id: { not: ownerId }, 
+          id: { not: ownerId },
         },
       });
-      if (existingOwnerContactNo) duplicateErrors.push("Contact Number is already in use.");
+      if (existingOwnerContactNo)
+        duplicateErrors.push("Contact Number is already in use.");
     }
-
 
     if (duplicateErrors.length > 0) {
-      return res.status(400).json({ status: "error", message: duplicateErrors });
+      return res
+        .status(400)
+        .json({ status: "error", message: duplicateErrors });
     }
 
-    const { updatedUser, updatedOwner } = await prisma.$transaction(async (prisma) => {
+    const { updatedUser, updatedOwner } = await prisma.$transaction(
+      async (prisma) => {
         let updatedUser;
         if (user) {
           updatedUser = await prisma.user.update({
@@ -163,3 +166,24 @@ export const updateOwner = async (req, res) => {
       .json({ status: "error", message: ["Internal server error"] });
   }
 };
+
+export async function deleteOwner(req, res) {
+  const ownerId = req.user.ownerId;
+  let errors = [];
+
+  try {
+    const response = await prisma.owner.delete({
+      where: { id: ownerId },
+    });
+
+    return res.status(200).json({
+      status: "success",
+      message: response,
+    });
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") console.error(error);
+    res
+      .status(500)
+      .json({ status: "error", message: ["Internal server error"] });
+  }
+}
