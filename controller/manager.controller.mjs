@@ -4,6 +4,7 @@ import {
   createManagerSchema,
   getAllManagerSchema,
   updateManagerSchema,
+  managerIdSchema,
 } from "../validation/manager.validation.mjs";
 import "dotenv/config";
 
@@ -271,6 +272,56 @@ export async function patchManager(req, res) {
     });
   } catch (err) {
     if (process.env.NODE_ENV === "development") console.error(err);
+    res
+      .status(500)
+      .json({ status: "error", message: ["Internal server error"] });
+  }
+}
+
+export async function deleteManager(req, res) {
+  const ownerId = req.user.ownerId;
+  const { error, value } = managerIdSchema.validate(req.params);
+  let errors = [];
+
+  if (error) {
+    const errorRespond = bodyError.details.map((err) => err.message);
+    return res.status(400).json({ status: "error", message: errorRespond });
+  }
+
+  const { managerId } = value;
+
+  try {
+    const existingManager = await prisma.manager.findUnique({
+      where: { id: managerId },
+      include: {
+        outlet: true,
+      },
+    });
+
+    if (!existingManager) {
+      return res.status(404).json({
+        status: "error",
+        message: ["Manager not found"],
+      });
+    }
+
+    if (existingManager.outlet.ownerId !== ownerId) {
+      return res.status(403).json({
+        status: "error",
+        message: ["Not authorized to delete the Manager"],
+      });
+    }
+
+    const response = await prisma.user.delete({
+      where: { id: existingManager.userId },
+    });
+
+    return res.status(200).json({
+      status: "success",
+      message: response,
+    });
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") console.error(error);
     res
       .status(500)
       .json({ status: "error", message: ["Internal server error"] });

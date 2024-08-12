@@ -3,6 +3,7 @@ import {
   createManager,
   getAllManagers,
   patchManager,
+  deleteManager,
 } from "../controller/manager.controller.mjs";
 import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
@@ -11,6 +12,7 @@ const router = Router();
 router.post("/new", checkRole("OWNER"), createManager);
 router.get("/all", checkRole("OWNER"), getAllManagers);
 router.patch("/edit/:managerId", checkRole("OWNER"), patchManager);
+router.delete("/delete/:managerId", checkRole("OWNER"), deleteManager);
 
 export default router;
 
@@ -409,4 +411,104 @@ export default router;
  *                   items:
  *                     type: string
  *                     example: "Internal server error"
+ */
+
+/**
+ * @swagger
+ * /api/v1/manager/delete/{id}:
+ *   delete:
+ *     tags:
+ *       - Manager
+ *     summary: Delete a manager
+ *     description: Deletes a manager by their ID if the requester is authorized.
+ *     parameters:
+ *       - in: path
+ *         name: managerId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID of the manager to delete
+ *         example: 1
+ *     responses:
+ *       '200':
+ *         description: Successfully deleted the manager
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "success"
+ *                 message:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 3
+ *                     name:
+ *                       type: string
+ *                       example: "Sundar"
+ *                     role:
+ *                       type: string
+ *                       example: "MANAGER"
+ *                     email:
+ *                       type: string
+ *                       example: "padmasena@gmail.com"
+ *                     password:
+ *                       type: string
+ *                       example: "$2a$10$Q4vYkQ3cK2EfQJeeYE4VhODWwNnvfRkfM5d947eQO4hD9pAJRhGDS"
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-10T11:35:39.611Z"
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-11T07:18:39.793Z"
+ *       '403':
+ *         description: Unauthorized to delete the manager
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Not authorized to delete the Manager"]
+ *       '404':
+ *         description: Manager not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Manager not found"]
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Internal server error"]
  */
