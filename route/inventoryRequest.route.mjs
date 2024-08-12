@@ -3,6 +3,7 @@ import {
   addInventoryRequest,
   getAllInventoryRequest,
   updateInventoryRequestStatus,
+  deleteInventoryRequest,
 } from "../controller/inventoryRequest.controller.mjs";
 import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
@@ -14,6 +15,11 @@ router.patch(
   "/updateStatus/:id",
   checkRole(["OWNER"]),
   updateInventoryRequestStatus
+);
+router.delete(
+  "/delete/:id",
+  checkRole(["OWNER", "MANAGER"]),
+  deleteInventoryRequest
 );
 
 export default router;
@@ -326,6 +332,103 @@ export default router;
  *                       type: string
  *                       format: date-time
  *                       example: "2024-08-11T11:59:06.568Z"
+ *       '404':
+ *         description: Inventory request not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Inventory request not found"]
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Internal server error"]
+ */
+
+/**
+ * @swagger
+ * /api/v1/inventoryRequest/delete/{id}:
+ *   delete:
+ *     tags:
+ *       - Inventory Request
+ *     summary: Delete an inventory request
+ *     description: Deletes an inventory request by its ID if the requester is authorized.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID of the inventory request to delete
+ *         example: 1
+ *     responses:
+ *       '200':
+ *         description: Successfully deleted the inventory request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "success"
+ *                 message:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     ownerId:
+ *                       type: integer
+ *                       example: 1
+ *                     managerId:
+ *                       type: integer
+ *                       example: 1
+ *                     status:
+ *                       type: string
+ *                       example: "APPROVED"
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-10T17:59:07.262Z"
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-11T11:59:06.568Z"
+ *       '403':
+ *         description: Unauthorized to delete the inventory request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Not authorized to delete this inventory request"]
  *       '404':
  *         description: Inventory request not found
  *         content:
