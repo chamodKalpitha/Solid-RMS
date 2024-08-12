@@ -3,6 +3,7 @@ import {
   getOwnerById,
   getAllOwners,
   updateOwner,
+  deleteOwner,
 } from "../controller/owner.controller.mjs";
 import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
@@ -11,6 +12,7 @@ const router = Router();
 router.get("/all", checkRole(["ADMIN"]), getAllOwners);
 router.get("/getById/:id", checkRole(["ADMIN", "MANAGER"]), getOwnerById);
 router.patch("/edit", checkRole(["ADMIN", "OWNER"]), updateOwner);
+router.delete("/delete", checkRole(["ADMIN", "OWNER"]), deleteOwner);
 
 export default router;
 
@@ -363,3 +365,70 @@ export default router;
  *                   example: ["Internal server error"]
  */
 
+/**
+ * @swagger
+ * /api/v1/owner/delete:
+ *   delete:
+ *     tags:
+ *       - Owner
+ *     summary: Delete the authenticated owner's account
+ *     description: Deletes the authenticated owner's account and all related data.
+ *     responses:
+ *       '200':
+ *         description: Successfully deleted the owner account
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "success"
+ *                 message:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     brNo:
+ *                       type: string
+ *                       example: "BR987654"
+ *                     companyName:
+ *                       type: string
+ *                       example: "Golden Spoon"
+ *                     userId:
+ *                       type: integer
+ *                       example: 1
+ *                     address:
+ *                       type: string
+ *                       example: "456 Elm Street, Colombo"
+ *                     url:
+ *                       type: string
+ *                       example: "https://www.img.com/b.png"
+ *                     contactNo:
+ *                       type: string
+ *                       example: "+0123456789"
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-10T07:23:25.196Z"
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-10T07:23:25.196Z"
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Internal server error"]
+ */
