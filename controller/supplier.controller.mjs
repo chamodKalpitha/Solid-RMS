@@ -1,5 +1,5 @@
 import prisma from "../prisma/prismaClient.mjs";
-import supplierSchema from "../validation/supplier.validation.mjs";
+import supplierSchema, { suplierIdSchema, updatSupllierSchema } from "../validation/supplier.validation.mjs";
 import "dotenv/config";
 
 export async function createSupplier(req, res) {
@@ -67,5 +67,61 @@ export async function createSupplier(req, res) {
     res
       .status(500)
       .json({ status: "error", message: ["Internal server error"] });
+  }
+}
+
+//update Suplier
+export async function updateSupplier (req,res){
+  const {error:idError, value:idValue} = suplierIdSchema.validate(req.params);
+
+  const {id} = idValue;
+  const ownerId = req.user.ownerId;
+
+  if (idError) {
+    const errorMessages = idError.details.map((err) => err.message);
+    return res.status(400).json({ status: "error", message: errorMessages });
+  }
+
+  const {error:bodyError, value:bodyValue} = updatSupllierSchema.validate(req.body);
+
+  const {name, email, contactNo, address, ingredients} = bodyValue;
+
+  if (bodyError) {
+    const errorRespond = bodyError.details.map((err) => err.message);
+    return res.status(400).json({ status: "error", message: errorRespond });
+  }
+
+  try {
+    const updatedSupplier = await prisma.supplier.update({
+      where: {
+        id, 
+        ownerId  
+      },
+      data: {
+        name,
+        email,
+        contactNo,
+        address,
+        supplierIngredients: ingredients
+          ? {
+              deleteMany: {}, 
+              create: ingredients.map((ingredient) => ({
+                ingredient: { connect: { id: ingredient } }, 
+              })),
+            }
+          : undefined,
+      },
+      include: {
+        supplierIngredients: true, 
+      },
+    });
+
+    return res.status(200).json({ status: "success", data: updatedSupplier });
+  } catch (error) {
+    if (error.code === "P2025") {
+      return res.status(404).json({ status: "error", message: ["Supplier not found"] });
+    }
+    if (process.env.NODE_ENV === "development") console.error(error);
+    return res.status(500).json({ status: "error", message: ["Internal server error"] });
   }
 }
