@@ -73,3 +73,11 @@ export const updateManagerSchema = Joi.object({
 }).options({
   abortEarly: false,
 });
+
+export const managerIdSchema = Joi.object({
+  managerId: Joi.number().integer().required().messages({
+    "number.base": "ID should be a number",
+    "number.integer": "ID should be an integer",
+    "any.required": "ID is required",
+  }),
+});
