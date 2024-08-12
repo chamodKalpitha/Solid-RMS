@@ -357,7 +357,7 @@ export default router;
 
 /**
  * @swagger
- * /api/v1/inventory/deleteInventory/{inventoryId}:
+ * /api/v1/inventory/deleteInventory/{id}:
  *   delete:
  *     tags:
  *       - Inventory

@@ -197,8 +197,8 @@ export async function deleteLeaveRequest(req, res) {
     }
 
     if (
-      leaveRequest.ownerId !== ownerId &&
-      leaveRequest.managerId !== managerId
+      (ownerId && leaveRequest.ownerId !== ownerId) ||
+      (managerId && leaveRequest.managerId !== managerId)
     ) {
       return res.status(403).json({
         status: "error",
