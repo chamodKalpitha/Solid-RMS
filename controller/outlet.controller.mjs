@@ -120,3 +120,50 @@ export async function updateOutlet(req, res) {
       .json({ status: "error", message: ["Internal server error"] });
   }
 }
+
+export async function deleteOutlet(req, res) {
+  const ownerId = req.user.ownerId;
+  const { error, value } = idSchema.validate(req.params);
+  let errors = [];
+
+  if (error) {
+    const errorRespond = bodyError.details.map((err) => err.message);
+    return res.status(400).json({ status: "error", message: errorRespond });
+  }
+
+  const { outletId } = value;
+
+  try {
+    const existingOutlet = await prisma.outlet.findUnique({
+      where: { id: outletId },
+    });
+
+    if (!existingOutlet) {
+      return res.status(404).json({
+        status: "error",
+        message: ["Outlet not found"],
+      });
+    }
+
+    if (existingOutlet.ownerId !== ownerId) {
+      return res.status(403).json({
+        status: "error",
+        message: ["Not authorized to delete the outlet"],
+      });
+    }
+
+    const response = await prisma.outlet.delete({
+      where: { id: outletId },
+    });
+
+    return res.status(200).json({
+      status: "success",
+      message: response,
+    });
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") console.error(error);
+    res
+      .status(500)
+      .json({ status: "error", message: ["Internal server error"] });
+  }
+}

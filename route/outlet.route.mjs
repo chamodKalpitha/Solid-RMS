@@ -3,6 +3,7 @@ import {
   createOutlet,
   getAllOutlet,
   updateOutlet,
+  deleteOutlet,
 } from "../controller/outlet.controller.mjs";
 import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
@@ -11,6 +12,7 @@ const router = Router();
 router.post("/new", checkRole(["OWNER"]), createOutlet);
 router.get("/all", checkRole(["OWNER"]), getAllOutlet);
 router.patch("/edit/:outletId", checkRole(["OWNER"]), updateOutlet);
+router.delete("/delete/:outletId", checkRole(["OWNER"]), deleteOutlet);
 
 export default router;
 
@@ -182,7 +184,7 @@ export default router;
 
 /**
  * @swagger
- * /api/v1/outlets/edit/{outletId}:
+ * /api/v1/outlet/edit/{id}:
  *   patch:
  *     tags:
  *       - Outlet
@@ -275,4 +277,102 @@ export default router;
  *                   items:
  *                     type: string
  *                     example: ["Internal server error"]
+ */
+
+/**
+ * @swagger
+ * /api/v1/outlet/delete/{id}:
+ *   delete:
+ *     tags:
+ *       - Outlet
+ *     summary: Delete an outlet
+ *     description: Deletes an outlet by its ID if the requester is authorized.
+ *     parameters:
+ *       - in: path
+ *         name: outletId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID of the outlet to delete
+ *         example: 1
+ *     responses:
+ *       '200':
+ *         description: Successfully deleted the outlet
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "success"
+ *                 message:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     location:
+ *                       type: string
+ *                       example: "kalutharaa"
+ *                     ownerId:
+ *                       type: integer
+ *                       example: 1
+ *                     menuId:
+ *                       type: integer
+ *                       nullable: true
+ *                       example: null
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-10T07:35:14.636Z"
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-11T05:17:45.743Z"
+ *       '403':
+ *         description: Unauthorized to delete the outlet
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Not authorized to delete the outlet"]
+ *       '404':
+ *         description: Outlet not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Outlet not found"]
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Internal server error"]
  */
