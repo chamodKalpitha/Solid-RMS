@@ -1,5 +1,5 @@
 import prisma from "../prisma/prismaClient.mjs";
-import supplierSchema, { suplierIdSchema, updatSupllierSchema } from "../validation/supplier.validation.mjs";
+import supplierSchema, { getAllSupplierSchema, suplierIdSchema, updatSupllierSchema } from "../validation/supplier.validation.mjs";
 import "dotenv/config";
 
 export async function createSupplier(req, res) {
@@ -123,5 +123,49 @@ export async function updateSupplier (req,res){
     }
     if (process.env.NODE_ENV === "development") console.error(error);
     return res.status(500).json({ status: "error", message: ["Internal server error"] });
+  }
+}
+
+//get all supplier
+export async function getAllSupplier(req, res) {
+  const ownerId = req.user.ownerId;
+
+  try {
+    const { error, value } = getAllSupplierSchema.validate(req.query);
+
+    if (error) {
+      const errorRespond = error.details.map((err) => err.message);
+      return res.status(400).json({ status: "error", message: errorRespond });
+    }
+
+    const { cursor, take } = value;
+    const takeNumber = parseInt(take) || 10;
+    const cursorObject = cursor ? { id: parseInt(cursor) } : undefined;
+
+    const suppliers = await prisma.supplier.findMany({
+      take: takeNumber,
+      skip: cursorObject ? 1 : 0,
+      cursor: cursorObject,
+      where: {
+        ownerId,
+      },
+      include: {
+        supplierIngredients: true,
+      },
+    });
+
+    const nextCursor =
+      suppliers.length === takeNumber
+        ? suppliers[suppliers.length - 1].id
+        : null;
+
+    res
+      .status(200)
+      .json({ status: "success", data: { suppliers, nextCursor } });
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") console.error(error);
+    res
+      .status(500)
+      .json({ status: "error", message: ["Internal server error"] });
   }
 }

@@ -64,3 +64,16 @@ export const updatSupllierSchema = Joi.object({
       "number.integer": "Ingredient ID should be an integer",
     })
   })
+
+  export const getAllSupplierSchema = Joi.object({
+    cursor: Joi.string().optional().messages({
+      "string.base": "Cursor must be a string",
+    }),
+    take: Joi.number().integer().positive().optional().default(10).messages({
+      "number.base": "Take must be a number",
+      "number.integer": "Take must be an integer",
+      "number.positive": "Take must be a positive number",
+    }),
+  }).options({
+    abortEarly: false,
+  });
