@@ -27,7 +27,7 @@ jobs:
       - name: Run Docker Container
         run: |
           docker run -d \
-            -p 3500:3500 \
+            -p ${{secrets.PORT}}:${{secrets.PORT}} \
             --name solid-rms-backend-container \
             -e NODE_ENV='${{ secrets.NODE_ENV }}' \
             -e PORT='${{ secrets.PORT }}' \
