@@ -11,7 +11,7 @@ const router = Router();
 
 router.post("/new", checkRole(["OWNER", "MANAGER"]), createIngredient);
 router.delete("/delete/:id", checkRole(["OWNER"]), deleteIngredient);
-router.get("/get", checkRole(["OWNER", "MANAGER"]), getIngredients);
+router.get("/all", checkRole(["OWNER", "MANAGER"]), getIngredients);
 router.patch("/edit/:id", checkRole(["OWNER", "MANAGER"]), updateIngredient);
 
 export default router;

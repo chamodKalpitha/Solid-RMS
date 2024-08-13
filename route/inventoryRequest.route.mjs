@@ -273,7 +273,7 @@ export default router;
 
 /**
  * @swagger
- * /api/v1/inventoryRequest/updateStatus/{inventoryRequestId}:
+ * /api/v1/inventoryRequest/updateStatus/{id}:
  *   patch:
  *     tags:
  *       - Inventory Request

@@ -168,12 +168,11 @@ export const updateOwner = async (req, res) => {
 };
 
 export async function deleteOwner(req, res) {
-  const ownerId = req.user.ownerId;
+  const userId = req.user.id;
   let errors = [];
-
   try {
-    const response = await prisma.owner.delete({
-      where: { id: ownerId },
+    const response = await prisma.user.delete({
+      where: { id: userId },
     });
 
     return res.status(200).json({

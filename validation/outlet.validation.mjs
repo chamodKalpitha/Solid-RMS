@@ -36,7 +36,7 @@ export const pacthOutletSchema = Joi.object({
 });
 
 export const idSchema = Joi.object({
-  outletId: Joi.number().integer().positive().required().messages({
+  id: Joi.number().integer().positive().required().messages({
     "number.base": "ID must be a number",
     "number.integer": "ID must be an integer",
     "number.positive": "ID must be a positive number",

@@ -11,8 +11,8 @@ const router = Router();
 
 router.post("/new", checkRole(["OWNER"]), createOutlet);
 router.get("/all", checkRole(["OWNER"]), getAllOutlet);
-router.patch("/edit/:outletId", checkRole(["OWNER"]), updateOutlet);
-router.delete("/delete/:outletId", checkRole(["OWNER"]), deleteOutlet);
+router.patch("/edit/:id", checkRole(["OWNER"]), updateOutlet);
+router.delete("/delete/:id", checkRole(["OWNER"]), deleteOutlet);
 
 export default router;
 
@@ -59,6 +59,10 @@ export default router;
  *                     ownerId:
  *                       type: integer
  *                       example: 1
+ *                     menuId:
+ *                       type: integer
+ *                       nullable: true
+ *                       example: null
  *                     createdAt:
  *                       type: string
  *                       format: date-time
@@ -192,26 +196,26 @@ export default router;
  *     description: Updates the details of an outlet associated with the authenticated owner.
  *     parameters:
  *       - in: path
- *         name: outletId
+ *         name: id
  *         schema:
  *           type: integer
  *         required: true
  *         description: The ID of the outlet to update.
  *         example: 1
- *       - in: body
- *         name: body
- *         description: The new details for the outlet.
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             location:
- *               type: string
- *               example: "kaluthara"
- *             menuId:
- *               type: integer
- *               nullable: true
- *               example: 5
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               location:
+ *                 type: string
+ *                 example: "kaluthara"
+ *               menuId:
+ *                 type: integer
+ *                 nullable: true
+ *                 example: 5
  *     responses:
  *       '200':
  *         description: Successfully updated the outlet
@@ -289,7 +293,7 @@ export default router;
  *     description: Deletes an outlet by its ID if the requester is authorized.
  *     parameters:
  *       - in: path
- *         name: outletId
+ *         name: id
  *         schema:
  *           type: integer
  *         required: true

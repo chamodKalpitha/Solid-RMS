@@ -270,41 +270,41 @@ export default router;
  *     summary: Update a manager's details
  *     description: Updates the details of a manager associated with the authenticated owner.
  *     parameters:
- *       - in: path
- *         name: managerId
+ *       - name: managerId
+ *         in: path
+ *         required: true
  *         schema:
  *           type: integer
- *         required: true
  *         description: The ID of the manager to update.
  *         example: 1
- *       - in: body
- *         name: body
- *         description: The new details for the manager.
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             status:
- *               type: string
- *               example: "ACTIVE"
- *             outletId:
- *               type: integer
- *               example: 1
- *             employeeId:
- *               type: integer
- *               example: 1
- *             user:
- *               type: object
- *               properties:
- *                 name:
- *                   type: string
- *                   example: "Sundar"
- *                 email:
- *                   type: string
- *                   example: "padmasena@gmail.com"
- *                 password:
- *                   type: string
- *                   example: "newpassword123"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 example: "ACTIVE"
+ *               outletId:
+ *                 type: integer
+ *                 example: 1
+ *               employeeId:
+ *                 type: integer
+ *                 example: 1
+ *               user:
+ *                 type: object
+ *                 properties:
+ *                   name:
+ *                     type: string
+ *                     example: "Sundar"
+ *                   email:
+ *                     type: string
+ *                     example: "padmasena@gmail.com"
+ *                   password:
+ *                     type: string
+ *                     example: "newpassword123"
  *     responses:
  *       '200':
  *         description: Successfully updated the manager
@@ -423,7 +423,7 @@ export default router;
  *     description: Deletes a manager by their ID if the requester is authorized.
  *     parameters:
  *       - in: path
- *         name: managerId
+ *         name: id
  *         schema:
  *           type: integer
  *         required: true

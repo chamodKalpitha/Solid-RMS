@@ -115,7 +115,7 @@ export async function getAllManagers(req, res) {
       where: {
         AND: {
           ownerId,
-          designation: "Manager",
+          designation: "MANAGER",
         },
       },
     });
@@ -132,51 +132,51 @@ export async function getAllManagers(req, res) {
   }
 }
 
-export async function updateOutlet(req, res) {
-  const ownerId = req.user.ownerId;
-  const { error: outletIderror, value: outletIdValue } = idSchema.validate(
-    req.params
-  );
-  const { error, value } = pacthOutletSchema.validate(req.body);
-  const { outletId } = outletIdValue;
+// export async function updateOutlet(req, res) {
+//   const ownerId = req.user.ownerId;
+//   const { error: outletIderror, value: outletIdValue } = idSchema.validate(
+//     req.params
+//   );
+//   const { error, value } = pacthOutletSchema.validate(req.body);
+//   const { outletId } = outletIdValue;
 
-  if (outletIderror) {
-    const errorRespond = error.details.map((err) => err.message);
-    return res.status(400).json({ status: "error", message: errorRespond });
-  }
+//   if (outletIderror) {
+//     const errorRespond = error.details.map((err) => err.message);
+//     return res.status(400).json({ status: "error", message: errorRespond });
+//   }
 
-  if (error) {
-    const errorRespond = error.details.map((err) => err.message);
-    return res.status(400).json({ status: "error", message: errorRespond });
-  }
+//   if (error) {
+//     const errorRespond = error.details.map((err) => err.message);
+//     return res.status(400).json({ status: "error", message: errorRespond });
+//   }
 
-  try {
-    const updatedOutlet = await prisma.outlet.update({
-      where: {
-        id: outletId,
-        ownerId,
-      },
-      data: value,
-    });
+//   try {
+//     const updatedOutlet = await prisma.outlet.update({
+//       where: {
+//         id: outletId,
+//         ownerId,
+//       },
+//       data: value,
+//     });
 
-    return res.status(200).json({
-      status: "success",
-      data: updatedOutlet,
-    });
-  } catch (error) {
-    if (error.code === "P2025") {
-      return res
-        .status(404)
-        .json({ status: "error", message: ["Outlet not found"] });
-    }
+//     return res.status(200).json({
+//       status: "success",
+//       data: updatedOutlet,
+//     });
+//   } catch (error) {
+//     if (error.code === "P2025") {
+//       return res
+//         .status(404)
+//         .json({ status: "error", message: ["Outlet not found"] });
+//     }
 
-    if (process.env.NODE_ENV === "development") console.error(error);
+//     if (process.env.NODE_ENV === "development") console.error(error);
 
-    res
-      .status(500)
-      .json({ status: "error", message: ["Internal server error"] });
-  }
-}
+//     res
+//       .status(500)
+//       .json({ status: "error", message: ["Internal server error"] });
+//   }
+// }
 
 export async function patchManager(req, res) {
   const { managerId } = req.params;
@@ -260,6 +260,8 @@ export async function patchManager(req, res) {
       include: { user: true },
     });
 
+    console.log(updatedManager);
+
     // Destructure to remove the password field
     const {
       user: { password, ...userWithoutPassword },
@@ -284,7 +286,7 @@ export async function deleteManager(req, res) {
   let errors = [];
 
   if (error) {
-    const errorRespond = bodyError.details.map((err) => err.message);
+    const errorRespond = error.details.map((err) => err.message);
     return res.status(400).json({ status: "error", message: errorRespond });
   }
 

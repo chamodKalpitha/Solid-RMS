@@ -226,7 +226,7 @@ export async function removeItemFromInventory(req, res) {
   );
   const { error, value } = removeItemSchema.validate(req.body);
   const { ingredientId } = value;
-  const { inventoryId } = paramValue;
+  const { id } = paramValue;
   let errors = [];
 
   if (error) {
@@ -241,7 +241,7 @@ export async function removeItemFromInventory(req, res) {
 
   try {
     const existingInventory = await prisma.inventory.findUnique({
-      where: { id: inventoryId },
+      where: { id },
       include: {
         outlet: true,
       },
@@ -260,7 +260,7 @@ export async function removeItemFromInventory(req, res) {
     const validIngredient = await prisma.inventoryIngredient.findUnique({
       where: {
         inventoryId_ingredientId: {
-          inventoryId: inventoryId,
+          inventoryId: id,
           ingredientId: ingredientId,
         },
       },
@@ -277,7 +277,7 @@ export async function removeItemFromInventory(req, res) {
     const response = await prisma.inventoryIngredient.delete({
       where: {
         inventoryId_ingredientId: {
-          inventoryId: inventoryId,
+          inventoryId: id,
           ingredientId: ingredientId,
         },
       },
