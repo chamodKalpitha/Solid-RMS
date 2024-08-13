@@ -34,7 +34,6 @@ app.use("*", (req, res) => {
   });
 });
 
-// Error handler for JSON parsing errors
 app.use((err, req, res, next) => {
   if (err instanceof SyntaxError) {
     return res.status(400).json({
