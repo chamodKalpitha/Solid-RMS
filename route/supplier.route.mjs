@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createSupplier, getAllSupplier, updateSupplier } from "../controller/supplier.controller.mjs";
+import { createSupplier, deleteSupplier, getAllSupplier, updateSupplier } from "../controller/supplier.controller.mjs";
 import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
 const router = Router();
@@ -7,6 +7,8 @@ const router = Router();
 router.post("/new", checkRole("OWNER"), createSupplier);
 router.patch("/edit/:id",checkRole(["OWNER"]),updateSupplier);
 router.get("/all",checkRole(["OWNER"]),getAllSupplier);
+router.delete("/delete/:id",checkRole(["OWNER"]),deleteSupplier);
+
 
 export default router;
 
@@ -341,6 +343,97 @@ export default router;
  *                       type: integer
  *                       example: 5
  *                       nullable: true
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example:
+ *                     - "Internal server error"
+ */
+
+
+/**
+ * @swagger
+ * /api/v1/supplier/delete/{id}:
+ *   delete:
+ *     tags:
+ *       - Supplier
+ *     summary: Delete a supplier
+ *     description: Deletes a supplier from the database based on the supplier ID and the owner ID.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The ID of the supplier to delete.
+ *         example: 1
+ *     responses:
+ *       '200':
+ *         description: Successfully deleted the supplier
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "success"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     name:
+ *                       type: string
+ *                       example: "Supplier XYZ"
+ *                     email:
+ *                       type: string
+ *                       example: "supplier@xyz.com"
+ *                     address:
+ *                       type: string
+ *                       example: "456 Supplier Rd"
+ *                     contactNo:
+ *                       type: string
+ *                       example: "+1234567890"
+ *                     ownerId:
+ *                       type: integer
+ *                       example: 2
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-12T22:34:48.406Z"
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-12T23:31:27.827Z"
+ *       '404':
+ *         description: Supplier not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example:
+ *                     - "Supplier not found"
  *       '500':
  *         description: Internal server error
  *         content:
