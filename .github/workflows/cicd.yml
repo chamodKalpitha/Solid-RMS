@@ -24,6 +24,10 @@ jobs:
     steps:
       - name: Pull Image from Docker Hub
         run: docker pull chamodkalpitha/solid-rms-backend:latest
+      - name: Stop existing container
+        run: docker stop solid-rms-backend-container || true
+      - name: Remove existing container
+        run: docker rm solid-rms-backend-container || true
       - name: Run Docker Container
         run: |
           docker run -d \
