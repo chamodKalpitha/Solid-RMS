@@ -81,10 +81,10 @@ export async function updateOutlet(req, res) {
     req.params
   );
   const { error, value } = pacthOutletSchema.validate(req.body);
-  const { outletId } = outletIdValue;
+  const { id } = outletIdValue;
 
   if (outletIderror) {
-    const errorRespond = error.details.map((err) => err.message);
+    const errorRespond = outletIderror.details.map((err) => err.message);
     return res.status(400).json({ status: "error", message: errorRespond });
   }
 
@@ -96,7 +96,7 @@ export async function updateOutlet(req, res) {
   try {
     const updatedOutlet = await prisma.outlet.update({
       where: {
-        id: outletId,
+        id,
         ownerId,
       },
       data: value,
@@ -127,15 +127,15 @@ export async function deleteOutlet(req, res) {
   let errors = [];
 
   if (error) {
-    const errorRespond = bodyError.details.map((err) => err.message);
+    const errorRespond = error.details.map((err) => err.message);
     return res.status(400).json({ status: "error", message: errorRespond });
   }
 
-  const { outletId } = value;
+  const { id } = value;
 
   try {
     const existingOutlet = await prisma.outlet.findUnique({
-      where: { id: outletId },
+      where: { id },
     });
 
     if (!existingOutlet) {
@@ -153,7 +153,7 @@ export async function deleteOutlet(req, res) {
     }
 
     const response = await prisma.outlet.delete({
-      where: { id: outletId },
+      where: { id },
     });
 
     return res.status(200).json({

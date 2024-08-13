@@ -17,7 +17,7 @@ router.patch(
   updateInventoryItem
 );
 router.delete(
-  "/deleteInventory/:inventoryId",
+  "/deleteInventory/:id",
   checkRole("OWNER"),
   removeItemFromInventory
 );
@@ -135,7 +135,7 @@ export default router;
 
 /**
  * @swagger
- * /api/v1/inventory/{outletId}:
+ * /api/v1/inventory/getById/{outletId}:
  *   get:
  *     tags:
  *       - Inventory
@@ -365,7 +365,7 @@ export default router;
  *     description: Removes an ingredient from the specified inventory, if it exists and belongs to the owner.
  *     parameters:
  *       - in: path
- *         name: inventoryId
+ *         name: id
  *         schema:
  *           type: integer
  *         required: true

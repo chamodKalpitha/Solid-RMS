@@ -321,7 +321,7 @@ export default router;
 
 /**
  * @swagger
- * /api/v1/leaveRequest/edit/{leaveRequestId}:
+ * /api/v1/leaveRequest/edit/{id}:
  *   patch:
  *     tags:
  *       - Leave Request

@@ -35,7 +35,7 @@ export const createOwnerSchema = Joi.object({
       "string.email": "Email must be a valid email address.",
       "any.required": "Email is required.",
     }),
-    password: Joi.string().min(6).required().messages({
+    password: Joi.string().min(8).required().messages({
       "string.empty": "Password is required.",
       "string.min": "Password must be at least 6 characters long.",
       "any.required": "Password is required.",
@@ -71,7 +71,6 @@ export const idSchema = Joi.object({
     "any.required": "ID is required",
   }),
 });
-
 
 export const updateOwnerSchema = Joi.object({
   brNo: Joi.string().optional().messages({
