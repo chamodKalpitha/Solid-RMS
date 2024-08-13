@@ -14,7 +14,6 @@
   "dependencies": {
     "@acpr/rate-limit-postgresql": "^1.4.1",
     "@prisma/client": "^5.17.0",
-    "@sequelize/core": "^7.0.0-alpha.41",
     "aws-sdk": "^2.1666.0",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",

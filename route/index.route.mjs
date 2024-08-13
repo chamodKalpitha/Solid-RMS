@@ -16,13 +16,13 @@ import inventoryRouter from "./inventory.route.mjs";
 import leaveRequestRouter from "./leaveRequest.route.mjs";
 import inventoryRequestRouter from "./inventoryRequest.route.mjs";
 import supplierOrderRouter from "./supplierOrder.route.mjs";
-// import s3Router from "./s3.route.mjs";
+import s3Router from "./s3.route.mjs";
 
 const router = Router();
 
 router.use("/auth", authRouter);
 
-router.use(verifyCsrfToken, passport.authenticate("jwt", { session: false }));
+router.use(passport.authenticate("jwt", { session: false }), verifyCsrfToken);
 
 router.use("/owner", ownerRouter);
 router.use("/outlet", outletRouter);
@@ -36,6 +36,6 @@ router.use("/inventory", inventoryRouter);
 router.use("/leaveRequest", leaveRequestRouter);
 router.use("/inventoryRequest", inventoryRequestRouter);
 router.use("/supplierOrder", supplierOrderRouter);
-// router.use("/s3SignedUrl", s3Router);
+router.use("/s3SignedUrl", s3Router);
 
 export default router;
