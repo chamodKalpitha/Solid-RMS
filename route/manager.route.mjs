@@ -9,10 +9,10 @@ import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
 const router = Router();
 
-router.post("/new", checkRole("OWNER"), createManager);
-router.get("/all", checkRole("OWNER"), getAllManagers);
-router.patch("/edit/:managerId", checkRole("OWNER"), patchManager);
-router.delete("/delete/:managerId", checkRole("OWNER"), deleteManager);
+router.post("/new", checkRole(["OWNER"]), createManager);
+router.get("/all", checkRole(["OWNER"]), getAllManagers);
+router.patch("/edit/:managerId", checkRole(["OWNER"]), patchManager);
+router.delete("/delete/:managerId", checkRole(["OWNER"]), deleteManager);
 
 export default router;
 

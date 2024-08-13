@@ -9,16 +9,16 @@ import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
 const router = Router();
 
-router.post("/add", checkRole("OWNER"), addItemToInventory);
-router.get("/getById/:outletId", checkRole("OWNER"), getInventoryById);
+router.post("/add", checkRole(["OWNER"]), addItemToInventory);
+router.get("/getById/:outletId", checkRole(["OWNER"]), getInventoryById);
 router.patch(
   "/updateInventory/:outletId",
-  checkRole("OWNER"),
+  checkRole(["OWNER"]),
   updateInventoryItem
 );
 router.delete(
   "/deleteInventory/:id",
-  checkRole("OWNER"),
+  checkRole(["OWNER"]),
   removeItemFromInventory
 );
 

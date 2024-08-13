@@ -30,8 +30,19 @@ app.use("/api/v1", router);
 app.use("*", (req, res) => {
   res.status(404).send({
     status: "error",
-    message: "Route not found",
+    message: ["Route not found"],
   });
+});
+
+// Error handler for JSON parsing errors
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError) {
+    return res.status(400).json({
+      status: "error",
+      message: ["Invalid JSON format"],
+    });
+  }
+  next(err);
 });
 
 app.listen(PORT, () => {

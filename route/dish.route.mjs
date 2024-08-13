@@ -1,15 +1,24 @@
 import { Router } from "express";
-import { createDish, deleteDishes, getAllDishes, updateDishes, updateDishIngredients } from "../controller/dish.controller.mjs";
+import {
+  createDish,
+  deleteDishes,
+  getAllDishes,
+  updateDishes,
+  updateDishIngredients,
+} from "../controller/dish.controller.mjs";
 import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
 const router = Router();
 
-router.post("/new", checkRole("OWNER"), createDish);
+router.post("/new", checkRole(["OWNER"]), createDish);
 router.get("/all", getAllDishes);
-router.patch("/dishEdit/:id", checkRole("OWNER"), updateDishes);
-router.patch("/dishIngredientEdit/:id",checkRole("OWNER"), updateDishIngredients);
-router.delete("/delete/:id",checkRole("OWNER"),deleteDishes);
-
+router.patch("/dishEdit/:id", checkRole(["OWNER"]), updateDishes);
+router.patch(
+  "/dishIngredientEdit/:id",
+  checkRole(["OWNER"]),
+  updateDishIngredients
+);
+router.delete("/delete/:id", checkRole(["OWNER"]), deleteDishes);
 
 export default router;
 
@@ -190,7 +199,6 @@ export default router;
  *                   example: ["Internal server error"]
  */
 
-
 /**
  * @swagger
  * /api/v1/dish/dishEdit/{id}:
@@ -292,7 +300,6 @@ export default router;
  *                   type: string
  *                   example: "Internal server error"
  */
-
 
 /**
  * @swagger
