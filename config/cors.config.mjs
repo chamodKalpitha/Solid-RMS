@@ -1,4 +1,4 @@
-const allowedOrigins = ["http://13.60.62.185:3500/"];
+const allowedOrigins = ["http://13.60.62.185:3500"];
 
 const corsOptions = {
   origin: (origin, callback) => {
