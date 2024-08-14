@@ -1,4 +1,4 @@
-const allowedOrigins = ["http://www.wwsadas.com"];
+const allowedOrigins = ["*"];
 
 export default function credentials(req, res, next) {
   const origin = req.headers.origin;
