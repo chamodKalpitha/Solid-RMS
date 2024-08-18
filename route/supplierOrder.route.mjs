@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { addSupplierOrder } from "../controller/supplierOrder.controller.mjs";
+import { addSupplierOrder, getAllSupplierOrder } from "../controller/supplierOrder.controller.mjs";
 import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
 const router = Router();
 
 router.post("/add", checkRole(["OWNER"]), addSupplierOrder);
+router.get("/all",checkRole(["OWNER"]),getAllSupplierOrder);
 
 export default router;
 
@@ -130,4 +131,102 @@ export default router;
  *                     type: string
  *                   example:
  *                     - "Internal server error"
+ */
+
+
+/**
+ * @swagger
+ * /api/v1/supplierOrder/all:
+ *   get:
+ *     tags:
+ *       - Supplier Orders
+ *     summary: Retrieve all supplier orders
+ *     description: Get a paginated list of all supplier orders for the authenticated owner.
+ *     parameters:
+ *       - in: query
+ *         name: cursor
+ *         schema:
+ *           type: integer
+ *         description: ID of the last item from the previous page for pagination. If not provided, retrieves from the start.
+ *       - in: query
+ *         name: take
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Number of supplier orders to return. Defaults to 10 if not provided.
+ *     responses:
+ *       '200':
+ *         description: Successfully retrieved supplier orders.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     supplierOrders:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                             example: 1
+ *                           totalValue:
+ *                             type: number
+ *                             format: float
+ *                             example: 150.00
+ *                           supplierId:
+ *                             type: integer
+ *                             example: 1
+ *                           ownerId:
+ *                             type: integer
+ *                             example: 2
+ *                           createdAt:
+ *                             type: string
+ *                             format: date-time
+ *                             example: "2024-08-12T22:34:48.406Z"
+ *                           supplierOrderIngredient:
+ *                             type: array
+ *                             items:
+ *                               type: object
+ *                               properties:
+ *                                 ingredientId:
+ *                                   type: integer
+ *                                   example: 1
+ *                                 quantity:
+ *                                   type: number
+ *                                   format: float
+ *                                   example: 5
+ *                                 createdAt:
+ *                                   type: string
+ *                                   format: date-time
+ *                                   example: "2024-08-12T22:34:48.406Z"
+ *                                 updatedAt:
+ *                                   type: string
+ *                                   format: date-time
+ *                                   example: "2024-08-12T22:34:48.406Z"
+ *                     nextCursor:
+ *                       type: integer
+ *                       nullable: true
+ *                       example: 15
+ *       '500':
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Internal server error"]
  */
