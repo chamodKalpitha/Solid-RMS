@@ -37,3 +37,14 @@ export const getAllSupplierOrderSchema = Joi.object({
 }).options({
   abortEarly: false,
 });
+
+export const suplierOrderIdSchema = Joi.object({
+  id: Joi.number().integer().positive().required().messages({
+    "number.base": "ID must be a number.",
+    "number.integer": "ID must be an integer.",
+    "number.positive": "ID must be a positive number.",
+    "any.required": "ID is required.",
+  }),
+}).options({
+  abortEarly: false,
+});
