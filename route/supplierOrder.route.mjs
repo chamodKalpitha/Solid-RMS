@@ -1,11 +1,13 @@
 import { Router } from "express";
-import { addSupplierOrder, getAllSupplierOrder } from "../controller/supplierOrder.controller.mjs";
+import { addSupplierOrder, deleteSupplierOrder, getAllSupplierOrder, getSupplierOrderById } from "../controller/supplierOrder.controller.mjs";
 import checkRole from "../middleware/authorizationChecker.middleware.mjs";
 
 const router = Router();
 
 router.post("/add", checkRole(["OWNER"]), addSupplierOrder);
 router.get("/all",checkRole(["OWNER"]),getAllSupplierOrder);
+router.get("/ById/:id",checkRole(["OWNER"]),getSupplierOrderById);
+router.delete("/delete/:id",checkRole(["OWNER"]),deleteSupplierOrder);
 
 export default router;
 
@@ -214,6 +216,191 @@ export default router;
  *                       type: integer
  *                       nullable: true
  *                       example: 15
+ *       '500':
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Internal server error"]
+ */
+
+
+/**
+ * @swagger
+ * /api/v1/supplierOrder/ById/{id}:
+ *   get:
+ *     tags:
+ *       - Supplier Orders
+ *     summary: Get a supplier order by ID
+ *     description: Retrieve a specific supplier order by its ID.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: The ID of the supplier order to retrieve.
+ *     responses:
+ *       '200':
+ *         description: Supplier order retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     totalValue:
+ *                       type: number
+ *                       example: 150.00
+ *                     supplierId:
+ *                       type: integer
+ *                       example: 1
+ *                     ownerId:
+ *                       type: integer
+ *                       example: 2
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-12T22:34:48.406Z"
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-12T22:34:48.406Z"
+ *                     supplierOrderIngredient:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           ingredientId:
+ *                             type: integer
+ *                             example: 1
+ *                           quantity:
+ *                             type: number
+ *                             example: 5
+ *                           createdAt:
+ *                             type: string
+ *                             format: date-time
+ *                             example: "2024-08-12T22:34:48.406Z"
+ *                           updatedAt:
+ *                             type: string
+ *                             format: date-time
+ *                             example: "2024-08-12T22:34:48.406Z"
+ *       '404':
+ *         description: Supplier order not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Supplier order not found"]
+ *       '500':
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Internal server error"]
+ */
+
+
+/**
+ * @swagger
+ * /api/v1/supplierOrder/delete/{id}:
+ *   delete:
+ *     tags:
+ *       - Supplier Orders
+ *     summary: Delete a supplier order by ID
+ *     description: Delete a specific supplier order by its ID.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: The ID of the supplier order to delete.
+ *     responses:
+ *       '200':
+ *         description: Supplier order deleted successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     totalValue:
+ *                       type: number
+ *                       example: 150.00
+ *                     supplierId:
+ *                       type: integer
+ *                       example: 1
+ *                     ownerId:
+ *                       type: integer
+ *                       example: 2
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-12T22:34:48.406Z"
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-12T22:34:48.406Z"
+ *       '404':
+ *         description: Supplier order not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Supplier order not found"]
  *       '500':
  *         description: Internal server error.
  *         content:
