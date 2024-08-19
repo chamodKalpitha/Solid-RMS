@@ -24,3 +24,27 @@ export default Joi.object({
       "any.required": "Ingredients are required",
     }),
 });
+
+export const getAllSupplierOrderSchema = Joi.object({
+  cursor: Joi.string().optional().messages({
+    "string.base": "Cursor must be a string",
+  }),
+  take: Joi.number().integer().positive().optional().default(10).messages({
+    "number.base": "Take must be a number",
+    "number.integer": "Take must be an integer",
+    "number.positive": "Take must be a positive number",
+  }),
+}).options({
+  abortEarly: false,
+});
+
+export const suplierOrderIdSchema = Joi.object({
+  id: Joi.number().integer().positive().required().messages({
+    "number.base": "ID must be a number.",
+    "number.integer": "ID must be an integer.",
+    "number.positive": "ID must be a positive number.",
+    "any.required": "ID is required.",
+  }),
+}).options({
+  abortEarly: false,
+});
