@@ -1,4 +1,4 @@
-const allowedOrigins = ["http://localhost:3500"];
+const allowedOrigins = ["http://13.60.62.185:3500"];
 
 export default function credentials(req, res, next) {
   const origin = req.headers.origin;
